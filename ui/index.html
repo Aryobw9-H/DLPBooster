@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DLP Booster — Deadlock FPS</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Ambient Light Effects -->
+  <div class="ambient-glow">
+    <div class="glow-blue"></div>
+    <div class="glow-orange"></div>
+    <div class="floor-reflection"></div>
+  </div>
+
+  <!-- Windows App Shell Titlebar -->
+  <div class="app-titlebar">
+    <div class="brand-meta">
+      <span class="brand-badge" data-i18n="brand">ددلاک پرشین</span>
+      <span data-i18n="brandTagline">ابزار بهینه‌سازی گرافیک و کانفیگ</span>
+    </div>
+    <div class="window-controls">
+      <button class="win-ctl" id="btn-min" title="Minimize" aria-label="Minimize">
+        <svg viewBox="0 0 12 12" width="12" height="12"><path d="M1 6h10" stroke="currentColor" stroke-width="1.4"/></svg>
+      </button>
+      <button class="win-ctl" id="btn-max" title="Maximize" aria-label="Maximize">
+        <svg viewBox="0 0 12 12" width="12" height="12"><rect x="1.5" y="1.5" width="9" height="9" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+      </button>
+      <button class="win-ctl win-close" id="btn-close" title="Close" aria-label="Close">
+        <svg viewBox="0 0 12 12" width="12" height="12"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.4"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <main class="app-viewport">
+
+    <!-- Hero Header -->
+    <header class="header-hero">
+      <div class="header-title-en" data-i18n="heroEn">DEADLOCK</div>
+      <div class="header-subtitle-accent" data-i18n="heroAccent">GRAPHICS CONFIG</div>
+      <div class="header-title-fa" data-i18n="heroFa">پیکربندی اختصاصی و افزایش اف‌پی‌اس برای بازیکنان ددلاک</div>
+      <button class="btn-launch" id="btn-launch">
+        <svg viewBox="0 0 16 16" width="14" height="14"><path d="M3 2l10 6-10 6z" fill="currentColor"/></svg>
+        <span data-i18n="launch">اجرای ددلاک</span>
+      </button>
+    </header>
+
+    <!-- No-game state -->
+    <section class="content-viewport" id="nogame-panel" style="display:none">
+      <div class="content-header">
+        <div class="content-header-title">
+          <svg viewBox="0 0 16 16" width="14" height="14"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 3a1.2 1.2 0 110 2.4A1.2 1.2 0 018 4zm0 8.2a.9.9 0 01-.9-.9V8.6a.9.9 0 111.8 0v3.7a.9.9 0 01-.9.9z" fill="currentColor"/></svg>
+          <span data-i18n="locate">پیدا کردن ددلاک</span>
+        </div>
+      </div>
+      <div class="options-grid">
+        <div class="option-item" style="flex-direction:column;align-items:stretch;gap:12px">
+          <div class="option-meta">
+            <div class="option-detail" data-i18n="locateDesc">پوشه نصب ددلاک پیدا نشد.</div>
+          </div>
+          <input type="text" class="path-input" id="path-input" placeholder="D:\SteamLibrary\steamapps\common\Deadlock" dir="ltr" />
+          <div style="display:flex;gap:10px">
+            <button class="btn-apply" id="btn-pick-folder"><span data-i18n="pickFolder">انتخاب پوشه</span></button>
+            <button class="btn-apply" id="btn-confirm-path"><span data-i18n="confirmPath">استفاده از این پوشه</span></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main content -->
+    <section id="main-ui" style="display:none">
+    <!-- 5 Category Cards -->
+    <section class="cards-deck">
+
+      <div class="sci-card active" id="card-display" onclick="selectCard(this, 'display')">
+        <div class="circuit-line"></div>
+        <svg class="card-icon" viewBox="0 0 16 16"><path d="M1.5 2h13a1 1 0 011 1v8a1 1 0 01-1 1h-5l1 2h-1.2l-1-2h-1.6l-1 2H4.5l1-2h-4a1 1 0 01-1-1V3a1 1 0 011-1zm.5 8h12V3.5H2V10z" fill="currentColor"/></svg>
+        <div class="card-star-divider"></div>
+        <div class="card-title" data-i18n="cardDisplay">صفحه نمایش</div>
+        <div class="card-desc" data-i18n="cardDisplayDesc">Tier presets & POTATO</div>
+      </div>
+
+      <div class="sci-card" id="card-engine" onclick="selectCard(this, 'engine')">
+        <div class="circuit-line"></div>
+        <svg class="card-icon" viewBox="0 0 16 16"><path d="M9.5 1l-.5 3a4 4 0 00-1.4.6L4.9 3.4 3.4 4.9l1.2 2.7a4 4 0 00-.6 1.4l-3 .5v2l3 .5c.1.5.3 1 .6 1.4l-1.2 2.7 1.5 1.5 2.7-1.2c.4.3.9.5 1.4.6l.5 3h2l.5-3a4 4 0 001.4-.6l2.7 1.2 1.5-1.5-1.2-2.7c.3-.4.5-.9.6-1.4l3-.5v-2l-3-.5a4 4 0 00-.6-1.4l1.2-2.7-1.5-1.5-2.7 1.2a4 4 0 00-1.4-.6l-.5-3h-2zm1 5.5a2.5 2.5 0 110 5 2.5 2.5 0 010-5z" fill="currentColor" transform="translate(-1.5 -1)"/></svg>
+        <div class="card-star-divider"></div>
+        <div class="card-title" data-i18n="cardEngine">موتور بازی</div>
+        <div class="card-desc" data-i18n="cardEngineDesc">Textures & LOD</div>
+      </div>
+
+      <div class="sci-card" id="card-latency" onclick="selectCard(this, 'latency')">
+        <div class="circuit-line"></div>
+        <svg class="card-icon" viewBox="0 0 16 16"><path d="M9 1L3 9h4l-1 6 7-9H8l1-5z" fill="currentColor"/></svg>
+        <div class="card-star-divider"></div>
+        <div class="card-title" data-i18n="cardLatency">پاسخ‌دهی گیم</div>
+        <div class="card-desc" data-i18n="cardLatencyDesc">Reflex & frame pacing</div>
+      </div>
+
+      <div class="sci-card" id="card-fov" onclick="selectCard(this, 'fov')">
+        <div class="circuit-line"></div>
+        <svg class="card-icon" viewBox="0 0 16 16"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 2a5 5 0 110 10A5 5 0 018 3zm0 3a2 2 0 100 4 2 2 0 000-4zM8 0h0M7.3 0h1.4v2.2H7.3zM7.3 13.8h1.4V16H7.3zM0 7.3h2.2v1.4H0zM13.8 7.3H16v1.4h-2.2z" fill="currentColor"/></svg>
+        <div class="card-star-divider"></div>
+        <div class="card-title" data-i18n="cardFov">نشانه و دید</div>
+        <div class="card-desc" data-i18n="cardFovDesc">Aspect ratio & viewmodel</div>
+      </div>
+
+      <div class="sci-card" id="card-advanced" onclick="selectCard(this, 'advanced')">
+        <div class="circuit-line"></div>
+        <svg class="card-icon" viewBox="0 0 16 16"><path d="M3 2h2v5H3zM3 9h2v5H3zM7 2h2v8H7zM7 12h2v2H7zM11 2h2v3h-2zM11 7h2v7h-2zM1 7h4v1H1zM5 10h4v1H5zM9 5h4v1H9z" fill="currentColor"/></svg>
+        <div class="card-star-divider"></div>
+        <div class="card-title" data-i18n="cardAdvanced">تنظیمات پیشرفته</div>
+        <div class="card-desc" data-i18n="cardAdvancedDesc">Backup, tester modes, autoexec</div>
+      </div>
+
+    </section>
+
+    <!-- Selected Tab Content Panel -->
+    <section class="content-viewport">
+      <div class="content-header">
+        <div class="content-header-title">
+          <svg viewBox="0 0 16 16" width="14" height="14"><path d="M9 1L3 9h4l-1 6 7-9H8l1-5z" fill="currentColor"/></svg>
+          <span id="section-title">پریست‌های عملکرد</span>
+        </div>
+        <span class="detect-badge" id="detect-badge" style="font-size: 0.8rem; color: var(--deadlock-cyan);"></span>
+      </div>
+
+      <!-- DISPLAY: tier presets -->
+      <div class="panel" id="panel-display">
+        <div class="options-grid">
+          <div class="option-item preset" data-mode="T1">
+            <div class="option-meta">
+              <div class="option-name" data-i18n="tier1">تییر ۱ — حداکثر فریم</div>
+              <div class="option-detail" data-i18n="tier1Desc">کاهش شدید بافت و ذرات.</div>
+            </div>
+            <div class="preset-pick"></div>
+          </div>
+          <div class="option-item preset" data-mode="T2">
+            <div class="option-meta">
+              <div class="option-name" data-i18n="tier2">تییر ۲ — متعادل</div>
+              <div class="option-detail" data-i18n="tier2Desc">کاهش سنگین با ظاهر قابل قبول.</div>
+            </div>
+            <div class="preset-pick"></div>
+          </div>
+          <div class="option-item preset" data-mode="T3">
+            <div class="option-meta">
+              <div class="option-name" data-i18n="tier3">تییر ۳ — سبک</div>
+              <div class="option-detail" data-i18n="tier3Desc">کاهش محافظه‌کارانه.</div>
+            </div>
+            <div class="preset-pick"></div>
+          </div>
+          <div class="option-item preset" data-mode="POTATO">
+            <div class="option-meta">
+              <div class="option-name" data-i18n="potato">پوتیتو (POTATO)</div>
+              <div class="option-detail" data-i18n="potatoDesc">حداقل مطلق.</div>
+            </div>
+            <div class="preset-pick"></div>
+          </div>
+        </div>
+        <div class="option-item" style="margin-top:10px">
+          <div class="option-meta">
+            <div class="option-name" data-i18n="unitStatus">رابط کاربری جدید ددلاک</div>
+            <div class="option-detail" data-i18n="unitStatusDesc">با نصب بعدی اعمال می‌شود</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="sw-unit-status">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- ENGINE / LATENCY: preset contents info -->
+      <div class="panel" id="panel-engine" style="display:none">
+        <div class="options-grid">
+          <div class="option-item"><div class="option-meta"><div class="option-name">T1: mip_bias 4</div><div class="option-detail">texture_stream_mip_bias = 4 — heaviest texture cut</div></div></div>
+          <div class="option-item"><div class="option-meta"><div class="option-name">T2: mip_bias 6</div><div class="option-detail">texture_stream_mip_bias = 6</div></div></div>
+          <div class="option-item"><div class="option-meta"><div class="option-name">T3: mip_bias 8</div><div class="option-detail">texture_stream_mip_bias = 8</div></div></div>
+          <div class="option-item"><div class="option-meta"><div class="option-name">All tiers</div><div class="option-detail">func_break_max_pieces 0 · ragdoll limits 0 · fewer gib pieces</div></div></div>
+        </div>
+      </div>
+
+      <div class="panel" id="panel-latency" style="display:none">
+        <div class="options-grid">
+          <div class="option-item"><div class="option-meta"><div class="option-name">Engine config</div><div class="option-detail">Frame pacing & queue tweaks come from the tier engine config, not separate switches.</div></div></div>
+          <div class="option-item"><div class="option-meta"><div class="option-name">Reflex</div><div class="option-detail">NVIDIA Reflex settings live in-game; this app does not touch them.</div></div></div>
+        </div>
+      </div>
+
+      <!-- FOV -->
+      <div class="panel" id="panel-fov" style="display:none">
+        <div class="options-grid">
+          <div class="option-item" style="flex-direction:column;align-items:stretch;gap:10px">
+            <div class="option-meta">
+              <div class="option-name" data-i18n="fovTitle">زاویه دید (FOV)</div>
+              <div class="option-detail"><span data-i18n="aspect">نسبت تصویر</span>: <span id="ar-preview" dir="ltr">2.15</span> — <span data-i18n="applied">با نصب بعدی اعمال می‌شود</span></div>
+            </div>
+            <div style="display:flex;gap:14px;align-items:center">
+              <input type="range" id="fov-slider" min="70" max="120" step="1" value="90" style="flex:1" />
+              <input type="number" id="fov-number" min="70" max="120" value="90" dir="ltr" class="path-input" style="width:90px" />
+              <span class="fov-label" data-i18n="fovValue">زاویه</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADVANCED -->
+      <div class="panel" id="panel-advanced" style="display:none">
+        <div class="options-grid">
+          <div class="option-item" style="flex-direction:column;align-items:stretch;gap:10px">
+            <div class="option-meta">
+              <div class="option-name" data-i18n="advTitle">بکاپ و بازگردانی</div>
+            </div>
+            <button class="btn-apply" id="btn-backup"><span data-i18n="backupNow">بکاپ فوری</span></button>
+            <div class="option-detail" data-i18n="restoreTitle">تاریخچه بکاپ‌ها</div>
+            <div id="backup-list" class="backup-list"></div>
+          </div>
+          <div class="option-item" style="flex-direction:column;align-items:stretch;gap:10px">
+            <div class="option-meta">
+              <div class="option-name" data-i18n="testerTitle">حالت‌های تستر</div>
+              <div class="option-detail" data-i18n="testerDesc">حالت‌های TEMP هر ۹ مود را نصب می‌کنند.</div>
+            </div>
+            <div id="tester-locked" style="display:flex;gap:10px">
+              <input type="password" class="path-input" id="unlock-input" style="flex:1" />
+              <button class="btn-apply" id="btn-unlock"><span data-i18n="unlock">فعال‌سازی</span></button>
+            </div>
+            <div id="tester-modes" style="display:none;flex-direction:column;gap:10px">
+              <div class="option-item preset" data-mode="T1MODS"><div class="option-meta"><div class="option-name" data-i18n="temp1">TEMP T1 + ALL MODS</div></div><div class="preset-pick"></div></div>
+              <div class="option-item preset" data-mode="T2MODS"><div class="option-meta"><div class="option-name" data-i18n="temp2">TEMP T2 + ALL MODS</div></div><div class="preset-pick"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="action-footer">
+        <div id="step-log" class="step-log"></div>
+        <div style="display:flex;gap:12px;align-items:center">
+          <span class="fov-summary" id="fov-summary" dir="ltr">FOV 90 · AR 2.15</span>
+          <button class="btn-apply" id="btn-install">
+            <svg viewBox="0 0 16 16" width="14" height="14"><path d="M6.5 12.5L2 8l1.4-1.4 3.1 3.1 6.1-6.1L14 5z" fill="currentColor"/></svg>
+            <span data-i18n="install">اعمال روی ددلاک</span>
+          </button>
+        </div>
+      </div>
+    </section>
+    </section>
+
+  </main>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modal" style="display:none">
+    <div class="modal-box">
+      <div class="modal-title" id="modal-title"></div>
+      <div class="modal-body" id="modal-body"></div>
+      <div class="modal-actions" id="modal-actions"></div>
+    </div>
+  </div>
+
+  <script src="i18n/fa.js"></script>
+  <script src="i18n/en.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

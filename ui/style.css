@@ -1,0 +1,558 @@
+    :root {
+      --bg-canvas: #06090e;
+      --bg-surface: #0a101b;
+      --bg-card: rgba(14, 23, 38, 0.75);
+      --bg-card-hover: rgba(22, 34, 55, 0.85);
+
+      --deadlock-orange: #f97316;
+      --deadlock-orange-glow: rgba(249, 115, 22, 0.45);
+      --deadlock-blue: #3b82f6;
+      --deadlock-blue-glow: rgba(59, 130, 246, 0.45);
+      --deadlock-cyan: #38bdf8;
+      
+      --text-main: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+
+      --card-border: rgba(59, 130, 246, 0.22);
+      --card-border-active: rgba(249, 115, 22, 0.75);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
+      font-family: 'Vazirmatn', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Ambient Atmosphere / Aurora Glows */
+    .ambient-glow {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .ambient-glow .glow-blue {
+      position: absolute;
+      width: 700px;
+      height: 700px;
+      left: -150px;
+      top: -150px;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.18) 0%, rgba(0, 0, 0, 0) 70%);
+      filter: blur(60px);
+    }
+
+    .ambient-glow .glow-orange {
+      position: absolute;
+      width: 650px;
+      height: 650px;
+      right: -100px;
+      top: -100px;
+      background: radial-gradient(circle, rgba(249, 115, 22, 0.14) 0%, rgba(0, 0, 0, 0) 70%);
+      filter: blur(70px);
+    }
+
+    .ambient-glow .floor-reflection {
+      position: absolute;
+      bottom: -10%;
+      left: 10%;
+      right: 10%;
+      height: 250px;
+      background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.12) 0%, rgba(0,0,0,0) 75%);
+      filter: blur(40px);
+    }
+
+    /* Windows Custom App Header Bar */
+    .app-titlebar {
+      height: 42px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 16px;
+      background: rgba(8, 11, 18, 0.9);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      position: relative;
+      z-index: 10;
+      backdrop-filter: blur(10px);
+    }
+
+    .brand-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .brand-badge {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: rgba(249, 115, 22, 0.15);
+      color: var(--deadlock-orange);
+      border: 1px solid rgba(249, 115, 22, 0.3);
+    }
+
+    .window-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .window-controls i:hover {
+      color: var(--text-main);
+    }
+
+    /* Main Container */
+    .app-viewport {
+      flex: 1;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 30px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Logo & Header Title matching Deadlock Config Banner */
+    .header-hero {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .header-title-en {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.8rem;
+      font-weight: 900;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      background: linear-gradient(180deg, #FFFFFF 20%, #94A3B8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 35px rgba(255, 255, 255, 0.2);
+      line-height: 1.1;
+      margin-bottom: 4px;
+      position: relative;
+      display: inline-block;
+    }
+
+    .header-subtitle-accent {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--deadlock-cyan);
+      text-shadow: 0 0 16px var(--deadlock-blue-glow);
+    }
+
+    .header-title-fa {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      margin-top: 8px;
+    }
+
+    /* 5-Card Futuristic Grid */
+    .cards-deck {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 18px;
+      width: 100%;
+      margin-bottom: 30px;
+    }
+
+    /* Cut-corner Hexagonal Sci-Fi Cards */
+    .sci-card {
+      position: relative;
+      height: 230px;
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 14px;
+      transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+      
+      /* Angled Chamfered Corners */
+      clip-path: polygon(
+        16px 0%, 
+        calc(100% - 16px) 0%, 
+        100% 16px, 
+        100% calc(100% - 16px), 
+        calc(100% - 16px) 100%, 
+        16px 100%, 
+        0% calc(100% - 16px), 
+        0% 16px
+      );
+    }
+
+    /* Outer glowing pseudo-border */
+    .sci-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      clip-path: inherit;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(255, 255, 255, 0.05) 50%, rgba(59, 130, 246, 0.25));
+      padding: 1.5px;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+      transition: all 0.25s ease;
+    }
+
+    /* Internal Circuit / Hologram Accents */
+    .sci-card .circuit-line {
+      position: absolute;
+      top: 10px;
+      width: 40px;
+      height: 2px;
+      background: rgba(59, 130, 246, 0.3);
+      transition: all 0.25s;
+    }
+
+    .sci-card .card-icon {
+      font-size: 2.2rem;
+      color: #cbd5e1;
+      margin-bottom: 18px;
+      transition: all 0.25s ease;
+      filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.15));
+    }
+
+    .sci-card .card-star-divider {
+      width: 6px;
+      height: 6px;
+      background: var(--deadlock-blue);
+      transform: rotate(45deg);
+      box-shadow: 0 0 10px var(--deadlock-blue);
+      margin-bottom: 12px;
+      transition: all 0.25s;
+    }
+
+    .sci-card .card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-main);
+      text-align: center;
+      transition: all 0.25s;
+    }
+
+    .sci-card .card-desc {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      text-align: center;
+    }
+
+    /* Hover States */
+    .sci-card:hover {
+      background: var(--bg-card-hover);
+      transform: translateY(-6px);
+    }
+
+    .sci-card:hover::before {
+      background: linear-gradient(135deg, var(--deadlock-cyan), rgba(255,255,255,0.2) 50%, var(--deadlock-blue));
+    }
+
+    .sci-card:hover .card-icon {
+      color: var(--deadlock-cyan);
+      transform: scale(1.1);
+      filter: drop-shadow(0 0 14px var(--deadlock-blue-glow));
+    }
+
+    /* Active / Selected Card State (Deadlock Persian Ember Mode) */
+    .sci-card.active {
+      background: rgba(26, 20, 25, 0.85);
+      transform: translateY(-6px);
+    }
+
+    .sci-card.active::before {
+      background: linear-gradient(135deg, #fb923c, #f97316 50%, #ea580c);
+    }
+
+    .sci-card.active .card-icon {
+      color: var(--deadlock-orange);
+      filter: drop-shadow(0 0 16px var(--deadlock-orange-glow));
+    }
+
+    .sci-card.active .card-star-divider {
+      background: var(--deadlock-orange);
+      box-shadow: 0 0 14px var(--deadlock-orange);
+    }
+
+    .sci-card.active .card-title {
+      color: #fff;
+    }
+
+    /* Active Content Panel / Configuration Options */
+    .content-viewport {
+      width: 100%;
+      background: rgba(14, 23, 38, 0.6);
+      border: 1px solid rgba(59, 130, 246, 0.15);
+      backdrop-filter: blur(12px);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .content-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 14px;
+    }
+
+    .content-header-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .content-header-title i {
+      color: var(--deadlock-orange);
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 8px;
+    }
+
+    .option-item {
+      background: rgba(11, 19, 33, 0.65);
+      border: 1px solid rgba(59, 130, 246, 0.12);
+      border-radius: 8px;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s;
+    }
+
+    .option-item:hover {
+      border-color: rgba(59, 130, 246, 0.35);
+      background: rgba(15, 25, 45, 0.85);
+    }
+
+    .option-meta .option-name {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .option-meta .option-detail {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    /* Custom Sci-Fi Toggle Switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: #1e293b;
+      transition: .3s;
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 4px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--deadlock-orange);
+      box-shadow: 0 0 10px var(--deadlock-orange-glow);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(19px);
+    }
+
+    /* Action Footer Bar */
+    .action-footer {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 14px;
+      margin-top: 12px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .btn-apply {
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      color: #fff;
+      border: none;
+      font-family: 'Vazirmatn', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 10px 28px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 18px var(--deadlock-orange-glow);
+      transition: all 0.2s;
+    }
+
+    .btn-apply:hover {
+      filter: brightness(1.15);
+      transform: scale(1.02);
+      box-shadow: 0 6px 24px rgba(249, 115, 22, 0.65);
+    }
+
+    .btn-reset {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--text-secondary);
+      font-family: 'Vazirmatn', sans-serif;
+      font-size: 0.9rem;
+      padding: 9px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-reset:hover {
+      border-color: var(--text-main);
+      color: var(--text-main);
+    }
+
+/* ---------- DLPBooster additions ---------- */
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('fonts/Vazirmatn[wght].woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Orbitron';
+  src: url('fonts/Orbitron-700.woff2') format('woff2');
+  font-weight: 700;
+}
+@font-face {
+  font-family: 'Orbitron';
+  src: url('fonts/Orbitron-900.woff2') format('woff2');
+  font-weight: 900;
+}
+@font-face {
+  font-family: 'Rajdhani';
+  src: url('fonts/Rajdhani-600.woff2') format('woff2');
+  font-weight: 600;
+}
+@font-face {
+  font-family: 'Rajdhani';
+  src: url('fonts/Rajdhani-700.woff2') format('woff2');
+  font-weight: 700;
+}
+
+.btn-launch {
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-top: 14px; padding: 10px 22px;
+  background: linear-gradient(135deg, rgba(249,115,22,.18), rgba(249,115,22,.06));
+  color: var(--deadlock-orange); border: 1px solid rgba(249,115,22,.45);
+  border-radius: 8px; font-family: 'Vazirmatn', sans-serif; font-size: .95rem;
+  cursor: pointer; transition: all .2s;
+}
+.btn-launch:hover { background: rgba(249,115,22,.28); box-shadow: 0 0 18px var(--deadlock-orange-glow); }
+.btn-launch.running { color: var(--deadlock-cyan); border-color: rgba(56,189,248,.45); background: linear-gradient(135deg, rgba(56,189,248,.15), rgba(56,189,248,.05)); }
+
+.win-ctl { background: none; border: none; color: var(--text-secondary); width: 30px; height: 26px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 4px; }
+.win-ctl:hover { background: rgba(255,255,255,.08); color: var(--text-main); }
+.win-ctl.win-close:hover { background: #e81123; color: #fff; }
+
+.path-input {
+  background: var(--bg-surface); border: 1px solid var(--card-border);
+  color: var(--text-main); padding: 9px 12px; border-radius: 6px;
+  font-family: 'Rajdhani', 'Vazirmatn', monospace; font-size: .95rem; outline: none;
+  user-select: text; -webkit-user-select: text;
+}
+.path-input:focus { border-color: var(--deadlock-cyan); box-shadow: 0 0 8px rgba(56,189,248,.25); }
+
+.panel { display: block; }
+
+.option-item.preset { cursor: pointer; transition: all .2s; border: 1px solid transparent; }
+.option-item.preset:hover { background: var(--bg-card-hover); }
+.option-item.preset.selected { border-color: var(--card-border-active); box-shadow: 0 0 14px rgba(249,115,22,.2); }
+.preset-pick { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--text-muted); flex-shrink: 0; transition: all .15s; }
+.option-item.preset.selected .preset-pick { border-color: var(--deadlock-orange); background: var(--deadlock-orange); box-shadow: 0 0 10px var(--deadlock-orange-glow); }
+
+.fov-label { font-family: 'Rajdhani', sans-serif; color: var(--text-secondary); font-weight: 700; letter-spacing: .1em; }
+.fov-summary { font-family: 'Rajdhani', monospace; color: var(--deadlock-cyan); font-weight: 600; font-size: .9rem; }
+
+#fov-slider { accent-color: var(--deadlock-orange); height: 4px; }
+
+.detect-badge { font-weight: 700; letter-spacing: .04em; }
+
+.backup-list { display: flex; flex-direction: column; gap: 6px; max-height: 180px; overflow-y: auto; }
+.backup-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: rgba(10,16,27,.6); border: 1px solid var(--card-border); border-radius: 6px; padding: 7px 12px; }
+.backup-name { font-family: 'Rajdhani', monospace; font-size: .88rem; color: var(--text-secondary); direction: ltr; }
+.backup-row .btn-restore { padding: 4px 14px; font-size: .8rem; }
+
+.step-log { flex: 1; display: flex; flex-direction: column; gap: 3px; font-family: 'Rajdhani', monospace; font-size: .85rem; color: var(--text-secondary); direction: ltr; text-align: left; max-height: 120px; overflow-y: auto; }
+.step-log .ok { color: #4ade80; }
+.step-log .skip { color: #eab308; }
+
+.modal-overlay { position: fixed; inset: 0; background: rgba(3,6,10,.7); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; }
+.modal-box { background: var(--bg-surface); border: 1px solid var(--card-border-active); border-radius: 12px; padding: 26px 30px; max-width: 440px; width: 90%; box-shadow: 0 10px 50px rgba(0,0,0,.6); }
+.modal-title { font-family: 'Orbitron', sans-serif; font-weight: 700; color: var(--deadlock-orange); margin-bottom: 12px; font-size: 1.05rem; }
+.modal-body { color: var(--text-main); font-size: .95rem; line-height: 1.7; margin-bottom: 20px; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+.modal-actions .btn-apply, .modal-actions .btn-reset { padding: 9px 22px; }
+
+button.btn-apply, button.btn-reset { font-family: 'Vazirmatn', sans-serif; }
+.btn-apply:disabled { opacity: .45; cursor: not-allowed; }
