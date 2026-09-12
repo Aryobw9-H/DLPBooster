@@ -4,9 +4,10 @@ mod commands;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
-        // Updater: silent-tolerant on 404 (no release yet) — default endpoints
-        // errors are non-fatal and surface only when a check is requested.
+        // Updater: silent-tolerant on 404 (no release yet) — endpoint errors
+        // surface only when a check is requested.
         .plugin(tauri_plugin_updater::Builder::new().build())
         .invoke_handler(tauri::generate_handler![
             commands::find_game,

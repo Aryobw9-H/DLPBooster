@@ -69,12 +69,12 @@
       </div>
     </section>
 
-    <!-- Main content -->
-    <section id="main-ui" style="display:none">
-    <!-- 5 Category Cards -->
+    <!-- Main content: visible by default — JS refines, never gates the UI -->
+    <section id="main-ui">
+      <!-- 5 Category Cards -->
     <section class="cards-deck">
 
-      <div class="sci-card active" id="card-display" onclick="selectCard(this, 'display')">
+      <div class="sci-card active" id="card-display">
         <div class="circuit-line"></div>
         <svg class="card-icon" viewBox="0 0 16 16"><path d="M1.5 2h13a1 1 0 011 1v8a1 1 0 01-1 1h-5l1 2h-1.2l-1-2h-1.6l-1 2H4.5l1-2h-4a1 1 0 01-1-1V3a1 1 0 011-1zm.5 8h12V3.5H2V10z" fill="currentColor"/></svg>
         <div class="card-star-divider"></div>
@@ -82,7 +82,7 @@
         <div class="card-desc" data-i18n="cardDisplayDesc">Tier presets & POTATO</div>
       </div>
 
-      <div class="sci-card" id="card-engine" onclick="selectCard(this, 'engine')">
+      <div class="sci-card" id="card-engine">
         <div class="circuit-line"></div>
         <svg class="card-icon" viewBox="0 0 16 16"><path d="M9.5 1l-.5 3a4 4 0 00-1.4.6L4.9 3.4 3.4 4.9l1.2 2.7a4 4 0 00-.6 1.4l-3 .5v2l3 .5c.1.5.3 1 .6 1.4l-1.2 2.7 1.5 1.5 2.7-1.2c.4.3.9.5 1.4.6l.5 3h2l.5-3a4 4 0 001.4-.6l2.7 1.2 1.5-1.5-1.2-2.7c.3-.4.5-.9.6-1.4l3-.5v-2l-3-.5a4 4 0 00-.6-1.4l1.2-2.7-1.5-1.5-2.7 1.2a4 4 0 00-1.4-.6l-.5-3h-2zm1 5.5a2.5 2.5 0 110 5 2.5 2.5 0 010-5z" fill="currentColor" transform="translate(-1.5 -1)"/></svg>
         <div class="card-star-divider"></div>
@@ -90,7 +90,7 @@
         <div class="card-desc" data-i18n="cardEngineDesc">Textures & LOD</div>
       </div>
 
-      <div class="sci-card" id="card-latency" onclick="selectCard(this, 'latency')">
+      <div class="sci-card" id="card-latency">
         <div class="circuit-line"></div>
         <svg class="card-icon" viewBox="0 0 16 16"><path d="M9 1L3 9h4l-1 6 7-9H8l1-5z" fill="currentColor"/></svg>
         <div class="card-star-divider"></div>
@@ -98,7 +98,7 @@
         <div class="card-desc" data-i18n="cardLatencyDesc">Reflex & frame pacing</div>
       </div>
 
-      <div class="sci-card" id="card-fov" onclick="selectCard(this, 'fov')">
+      <div class="sci-card" id="card-fov">
         <div class="circuit-line"></div>
         <svg class="card-icon" viewBox="0 0 16 16"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 2a5 5 0 110 10A5 5 0 018 3zm0 3a2 2 0 100 4 2 2 0 000-4zM8 0h0M7.3 0h1.4v2.2H7.3zM7.3 13.8h1.4V16H7.3zM0 7.3h2.2v1.4H0zM13.8 7.3H16v1.4h-2.2z" fill="currentColor"/></svg>
         <div class="card-star-divider"></div>
@@ -106,7 +106,7 @@
         <div class="card-desc" data-i18n="cardFovDesc">Aspect ratio & viewmodel</div>
       </div>
 
-      <div class="sci-card" id="card-advanced" onclick="selectCard(this, 'advanced')">
+      <div class="sci-card" id="card-advanced">
         <div class="circuit-line"></div>
         <svg class="card-icon" viewBox="0 0 16 16"><path d="M3 2h2v5H3zM3 9h2v5H3zM7 2h2v8H7zM7 12h2v2H7zM11 2h2v3h-2zM11 7h2v7h-2zM1 7h4v1H1zM5 10h4v1H5zM9 5h4v1H9z" fill="currentColor"/></svg>
         <div class="card-star-divider"></div>
