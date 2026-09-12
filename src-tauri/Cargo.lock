@@ -932,6 +932,7 @@ name = "dlpbooster"
 version = "0.1.0"
 dependencies = [
  "dlp-core",
+ "open",
  "serde",
  "serde_json",
  "tauri",
