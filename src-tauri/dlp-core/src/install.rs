@@ -103,8 +103,9 @@ pub fn install(mode: Mode, fov: u32, deadlock: &str, pkg: &Path, data_dir: &Path
     let mut log = vec![];
     let citadel = Path::new(deadlock).join("game").join("citadel");
 
-    // 1) guard (BACKUP/RESTORE exempt — those go through backup.rs, not here)
-    if std::env::var("DLPB_NOGUARD").as_deref() != Ok("1") {
+    // 1) guard (BACKUP/RESTORE exempt — those go through backup.rs, not here).
+    // Sandbox tests also count: any DLPB sandbox install dir is not a real game.
+    if std::env::var("DLPB_NOGUARD").as_deref() != Ok("1") && std::env::var("DLPB_TEST_SANDBOX").as_deref() != Ok("1") {
         let running = crate::guard::game_running();
         if !running.is_empty() {
             return Err(format!("game running: {} — close Deadlock first", running.join(", ")));
@@ -183,24 +184,24 @@ mod tests {
 
     fn sandbox(tag: &str) -> (std::path::PathBuf, std::path::PathBuf, std::path::PathBuf) {
         let base = std::env::temp_dir().join(format!("dlpb_inst_{tag}"));
-        let _ = std::fs::remove_dir_all(&base);
-        let cit = base.join("cit");
+        crate::backup::rm_ro(&base);
+        // layout must mirror a real install: <deadlock>\game\citadel
+        let cit = base.join("game").join("citadel");
         std::fs::create_dir_all(cit.join("cfg")).unwrap();
         std::fs::create_dir_all(cit.join("addons")).unwrap();
         std::fs::write(cit.join("gameinfo.gi"), "\"Version\" \"13\"\n\"r_aspectratio\"\t\t\t\t\t\t\"2.15\"\n").unwrap();
         std::fs::write(cit.join("cfg").join("video.txt"), "\"Version\" \"11\"\n\"setting.defaultres\" \"2560\"\n\"setting.defaultresheight\" \"1440\"\n\"setting.refreshrate_numerator\" \"165\"\n").unwrap();
         let data = base.join("data");
         std::fs::create_dir_all(&data).unwrap();
-        std::env::set_var("DLPB_DATA_DIR", &data);
-        std::env::set_var("DLPB_NOGUARD", "1");
-        let pkg = payload::extract().unwrap();
+        std::env::set_var("DLPB_TEST_SANDBOX", "1"); // process-wide, once is enough
+        let pkg = crate::payload::extract_to(&base.join("pkg")).unwrap();
         (cit, data, pkg)
     }
 
     #[test]
     fn sandbox_t1_end_to_end() {
         let (cit, data, pkg) = sandbox("t1");
-        let deadlock = cit.parent().unwrap().parent().unwrap().to_path_buf();
+        let deadlock = cit.parent().unwrap().parent().unwrap().to_path_buf(); // <deadlock> root
         let log = install(Mode::T1, 90, deadlock.to_str().unwrap(), &pkg, &data).unwrap();
         // step log lines
         for step in ["write-test", "gameinfo.gi", "addons", "video.txt"] {
@@ -219,16 +220,16 @@ mod tests {
         assert_eq!(man.lines().count(), 6);
         // video.txt merged with user identity + read-only
         let v = std::fs::read_to_string(cit.join("cfg").join("video.txt")).unwrap();
-        assert!(v.contains("\"Version\" \"11\""));
+        assert!(v.contains("\"Version\"		\"11\""), "Version kept: {v}");
         assert!(v.contains("\"setting.defaultres\" \"2560\""));
         assert!(std::fs::metadata(cit.join("cfg").join("video.txt")).unwrap().permissions().readonly());
-        let _ = std::fs::remove_dir_all(cit.parent().unwrap().parent().unwrap());
+        crate::backup::rm_ro(cit.parent().unwrap().parent().unwrap());
     }
 
     #[test]
     fn sandbox_potato_three_vpks() {
         let (cit, data, pkg) = sandbox("pot");
-        let deadlock = cit.parent().unwrap().parent().unwrap().to_path_buf();
+        let deadlock = cit.parent().unwrap().parent().unwrap().to_path_buf(); // <deadlock> root
         install(Mode::Potato, 100, deadlock.to_str().unwrap(), &pkg, &data).unwrap();
         // potato gi = tier3, AR for fov 100 = 2.49
         let gi = std::fs::read_to_string(cit.join("gameinfo.gi")).unwrap();
@@ -239,25 +240,25 @@ mod tests {
         for n in ["pak01_dir.vpk", "pak02_dir.vpk", "pak03_dir.vpk"] {
             assert!(vpks.iter().any(|v| v == n), "missing {n}");
         }
-        let _ = std::fs::remove_dir_all(cit.parent().unwrap().parent().unwrap());
+        crate::backup::rm_ro(cit.parent().unwrap().parent().unwrap());
     }
 
     #[test]
     fn sandbox_idempotent_second_run() {
         let (cit, data, pkg) = sandbox("idem");
-        let deadlock = cit.parent().unwrap().parent().unwrap().to_path_buf();
+        let deadlock = cit.parent().unwrap().parent().unwrap().to_path_buf(); // <deadlock> root
         install(Mode::T1, 90, deadlock.to_str().unwrap(), &pkg, &data).unwrap();
         let second = install(Mode::T1, 90, deadlock.to_str().unwrap(), &pkg, &data).unwrap();
         let gi_step = second.iter().find(|l| l.step == "gameinfo.gi").unwrap();
         assert!(gi_step.skipped, "second run should skip identical gi: {gi_step:?}");
-        let _ = std::fs::remove_dir_all(cit.parent().unwrap().parent().unwrap());
+        crate::backup::rm_ro(cit.parent().unwrap().parent().unwrap());
     }
 
     #[test]
     fn timestamp_shape() {
         let ts = timestamp_utc(0);
         assert_eq!(ts, "1970-01-01_000000");
-        // 2026-09-12 00:00:00 UTC = 1786224000
-        assert_eq!(timestamp_utc(1786224000), "2026-09-12_000000");
+        // 2026-09-12 00:00:00 UTC = 1789171200
+        assert_eq!(timestamp_utc(1789171200), "2026-09-12_000000");
     }
 }

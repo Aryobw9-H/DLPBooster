@@ -37,18 +37,25 @@ fn settings_path() -> PathBuf {
     data_dir().join("settings.json")
 }
 
-pub fn load() -> Settings {
-    match std::fs::read(settings_path()) {
+fn load_from(dir: &PathBuf) -> Settings {
+    match std::fs::read(dir.join("settings.json")) {
         Ok(bytes) => serde_json::from_slice(&bytes).unwrap_or_default(),
         Err(_) => Settings::default(),
     }
 }
 
-pub fn save(s: &Settings) -> std::io::Result<()> {
-    let dir = data_dir();
-    std::fs::create_dir_all(&dir)?;
-    std::fs::write(settings_path(), serde_json::to_string_pretty(s)?)?;
+fn save_to(dir: &PathBuf, s: &Settings) -> std::io::Result<()> {
+    std::fs::create_dir_all(dir)?;
+    std::fs::write(dir.join("settings.json"), serde_json::to_string_pretty(s)?)?;
     Ok(())
+}
+
+pub fn load() -> Settings {
+    load_from(&data_dir())
+}
+
+pub fn save(s: &Settings) -> std::io::Result<()> {
+    save_to(&data_dir(), s)
 }
 
 #[cfg(test)]
@@ -58,39 +65,36 @@ mod tests {
     #[test]
     fn load_missing_defaults() {
         let tmp = std::env::temp_dir().join("dlpb_settings_missing");
-        let _ = std::fs::remove_dir_all(&tmp);
-        std::env::set_var("DLPB_DATA_DIR", &tmp);
-        let s = load();
+        crate::backup::rm_ro(&tmp);
+        let s = load_from(&tmp);
         assert_eq!(s.lang, "fa");
         assert!(!s.unlocked);
         assert!(s.last_path.is_none());
         assert!(!s.unit_status_new);
-        let _ = std::fs::remove_dir_all(&tmp);
+        crate::backup::rm_ro(&tmp);
     }
 
     #[test]
     fn save_reload_roundtrip() {
         let tmp = std::env::temp_dir().join("dlpb_settings_rt");
-        let _ = std::fs::remove_dir_all(&tmp);
-        std::env::set_var("DLPB_DATA_DIR", &tmp);
+        crate::backup::rm_ro(&tmp);
         let s = Settings { lang: "en".into(), unlocked: true, last_path: Some("D:\\SteamLibrary\\steamapps\\common\\Deadlock".into()), unit_status_new: true };
-        save(&s).unwrap();
-        let s2 = load();
+        save_to(&tmp, &s).unwrap();
+        let s2 = load_from(&tmp);
         assert_eq!(s2.lang, "en");
         assert!(s2.unlocked);
         assert_eq!(s2.last_path.as_deref(), Some("D:\\SteamLibrary\\steamapps\\common\\Deadlock"));
         assert!(s2.unit_status_new);
-        let _ = std::fs::remove_dir_all(&tmp);
+        crate::backup::rm_ro(&tmp);
     }
 
     #[test]
     fn corrupt_file_falls_back_to_defaults() {
         let tmp = std::env::temp_dir().join("dlpb_settings_bad");
-        let _ = std::fs::remove_dir_all(&tmp);
+        crate::backup::rm_ro(&tmp);
         std::fs::create_dir_all(&tmp).unwrap();
         std::fs::write(tmp.join("settings.json"), b"{not json").unwrap();
-        std::env::set_var("DLPB_DATA_DIR", &tmp);
-        assert_eq!(load().lang, "fa");
-        let _ = std::fs::remove_dir_all(&tmp);
+        assert_eq!(load_from(&tmp).lang, "fa");
+        crate::backup::rm_ro(&tmp);
     }
 }

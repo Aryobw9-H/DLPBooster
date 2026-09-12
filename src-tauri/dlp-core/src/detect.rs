@@ -32,10 +32,12 @@ pub fn normalize(text: &str) -> String {
     for line in t.split_inclusive('\n') {
         // PS1 drops only lines matching "r_aspectratio"\s+"[0-9.]+"\r?\n
         if let Some(rest) = line.trim_start().strip_prefix("\"r_aspectratio\"") {
-            let v = rest.trim_start().trim_start_matches('"');
-            let num: String = v.chars().take_while(|c| c.is_ascii_digit() || *c == '.').collect();
-            if !num.is_empty() && v.starts_with('"') {
-                continue;
+            let after = rest.trim_start();
+            if let Some(v) = after.strip_prefix('"') {
+                let num: String = v.chars().take_while(|c| c.is_ascii_digit() || *c == '.').collect();
+                if !num.is_empty() && v[num.len()..].starts_with('"') {
+                    continue;
+                }
             }
         }
         out.push_str(line);
@@ -97,7 +99,7 @@ mod tests {
     #[test]
     fn detect_bom_and_fov_insensitive() {
         let tmp = std::env::temp_dir().join("dlpb_detect_test");
-        let _ = std::fs::remove_dir_all(&tmp);
+        crate::backup::rm_ro(&tmp);
         let tier1 = tmp.join("gi_tier1");
         std::fs::create_dir_all(&tier1).unwrap();
         let base = "\"Version\" \"13\"\n\"r_aspectratio\"\t\t\t\t\t\t\"2.15\"\n";
@@ -118,6 +120,6 @@ mod tests {
         std::fs::create_dir_all(&empty).unwrap();
         assert_eq!(detect_tier(&empty, &tmp), Tier::Missing);
 
-        let _ = std::fs::remove_dir_all(&tmp);
+        crate::backup::rm_ro(&tmp);
     }
 }

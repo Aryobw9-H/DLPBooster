@@ -1,16 +1,21 @@
 // Embedded console payload (tier dirs + addons). Extracted fresh per action —
 // never reused across runs (stale stable-copy trap from the console .bat).
-pub static PAYLOAD_ZIP: &[u8] = include_bytes!("../payload.zip");
+pub static PAYLOAD_ZIP: &[u8] = include_bytes!("../../payload.zip");
 
 pub fn extract() -> std::io::Result<std::path::PathBuf> {
-    let dir = std::env::temp_dir().join("DLPBoosterPkg");
+    extract_to(&std::env::temp_dir().join("DLPBoosterPkg"))
+}
+
+/// Extract into an explicit dir (tests use per-test dirs — the default dir is
+/// shared process-global and parallel tests would race on the wipe).
+pub fn extract_to(dir: &std::path::Path) -> std::io::Result<std::path::PathBuf> {
     if dir.exists() {
-        std::fs::remove_dir_all(&dir)?;
+        std::fs::remove_dir_all(dir)?;
     }
-    std::fs::create_dir_all(&dir)?;
+    std::fs::create_dir_all(dir)?;
     let mut zip = zip::ZipArchive::new(std::io::Cursor::new(PAYLOAD_ZIP))?;
-    zip.extract(&dir)?;
-    Ok(dir)
+    zip.extract(dir)?;
+    Ok(dir.to_path_buf())
 }
 
 pub fn payload_dir(pkg: &std::path::Path, name: &str) -> std::path::PathBuf {

@@ -33,24 +33,21 @@ pub fn parse_kv(line: &str) -> Option<(&str, &str)> {
     Some((k, &v[..vclose]))
 }
 
-/// Parse a template line into (key, prefix end = value's opening quote index,
-/// trailing start = index after value's closing quote).
-/// Mirrors PS1 regex ^(\s*"([^"]+)"\s+)"([^"]*)"(.*)$.
+/// Parse a template line into (key, value-opening-quote index, trailing-start
+/// index). Mirrors PS1 regex ^(\s*"([^"]+)"\s+)"([^"]*)"(.*)$ — handles both
+/// flat key-value files and braced VDF (indented keys under "video.cfg" {).
 fn parse_line(ln: &str) -> Option<(&str, usize, usize)> {
-    let t = ln.trim_start();
-    if !t.starts_with('"') {
-        return None;
-    }
-    let rest = &t[1..];
+    let idx = ln.find('"')?;
+    let rest = &ln[idx + 1..];
     let close = rest.find('"')?;
     let k = &rest[..close];
     let after_key = &rest[close + 1..];
     let gap = after_key.len() - after_key.trim_start().len();
     if after_key[gap..].starts_with('"') {
-        let prefix_end = ln.len() - after_key.len() + gap; // index of value's opening quote
+        let prefix_end = idx + 1 + close + 1 + gap; // index of value's opening quote
         let v = &after_key[gap + 1..];
         let vclose = v.find('"')?;
-        let trailing_start = ln.len() - v.len() + vclose + 1;
+        let trailing_start = idx + 1 + close + 1 + gap + 1 + vclose + 1;
         return Some((k, prefix_end, trailing_start));
     }
     None
@@ -61,7 +58,7 @@ pub fn merge_video(user: &str, template: &str) -> String {
     let mut uvals: Vec<(&str, &str)> = Vec::new();
     for ln in strip_bom(user).lines() {
         if let Some((k, v)) = parse_kv(ln) {
-            if !uvals.iter().any(|(ek, _)| ek == k) {
+            if !uvals.iter().any(|(ek, _)| *ek == k) {
                 uvals.push((k, v));
             }
         }

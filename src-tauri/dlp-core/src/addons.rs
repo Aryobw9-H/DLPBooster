@@ -117,7 +117,7 @@ mod tests {
 
     fn setup(tag: &str) -> (std::path::PathBuf, std::path::PathBuf) {
         let base = std::env::temp_dir().join(format!("dlpb_addon_{tag}"));
-        let _ = std::fs::remove_dir_all(&base);
+        crate::backup::rm_ro(&base);
         let src = base.join("src");
         let dst = base.join("cit").join("addons");
         std::fs::create_dir_all(&src).unwrap();
@@ -159,15 +159,15 @@ mod tests {
         touch(&src.join("pak04_dir.vpk"), 10);
         touch(&src.join("pak07_dir.vpk"), 10);
         let rep = install_addons(&src, &dst, "", "").unwrap();
-        assert_eq!(rep.renumbered.len(), 2);
-        // first conflict pak04 -> pak10 (above 09), then pak07 -> pak11
+        // pak04 conflicts (renumbered above dst max 09); pak07 absent in dst = plain add
+        assert_eq!(rep.renumbered.len(), 1);
         assert_eq!(rep.renumbered[0], ("pak04_dir.vpk".into(), "pak10_dir.vpk".into()));
-        assert_eq!(rep.renumbered[1], ("pak07_dir.vpk".into(), "pak11_dir.vpk".into()));
+        assert!(rep.added.contains(&"pak07_dir.vpk".to_string()));
         // user's pak04 untouched
         assert_eq!(std::fs::metadata(dst.join("pak04_dir.vpk")).unwrap().len(), 20);
         let man = std::fs::read_to_string(dst.parent().unwrap().join("addons_manifest.txt")).unwrap();
         assert!(man.contains("pak10_dir.vpk"));
-        assert!(man.contains("pak11_dir.vpk"));
+        assert!(man.contains("pak07_dir.vpk"));
     }
 
     #[test]

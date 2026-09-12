@@ -1,8 +1,11 @@
+[workspace]
+members = [".", "dlp-core"]
+
 [package]
 name = "dlpbooster"
 version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
+description = "DLPBooster - Deadlock FPS/graphics GUI"
+authors = ["Aryobw9-H"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -11,7 +14,7 @@ edition = "2021"
 # The `_lib` suffix may seem redundant but it is necessary
 # to make the lib name unique and wouldn't conflict with the bin name.
 # This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
-# cd ylib removed: windows-gnu debug linker caps DLL export ordinals at 65535
+# cdylib removed: windows-gnu debug linker caps DLL export ordinals at 65535
 # and Tauri debug builds export ~91k symbols ("export ordinal too large").
 # staticlib+rlib covers desktop builds; re-add cdylib only for mobile dev.
 name = "dlpbooster_lib"
@@ -25,8 +28,7 @@ tauri = { version = "2", features = [] }
 tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-zip = "2"
-
+dlp-core = { path = "dlp-core" }
 
 # Read the optimization guideline for more details: https://tauri.app/concept/size/#cargo-configuration
 [profile.release]

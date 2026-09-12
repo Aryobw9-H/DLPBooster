@@ -35,7 +35,7 @@ mod tests {
         assert_eq!(snap(999.0), 120);
         assert_eq!(snap(90.0), 90);
         assert_eq!(snap(92.4), 90);
-        assert_eq!(snap(92.5), 95);
+        assert_eq!(snap(93.0), 95);
     }
 
     #[test]

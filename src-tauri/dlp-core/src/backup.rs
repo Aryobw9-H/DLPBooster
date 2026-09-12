@@ -6,6 +6,35 @@
 // copy backup addons back, NEVER touch *.dlp.bak snapshots (permanent).
 use std::path::Path;
 
+/// Remove a directory tree, clearing read-only flags first (Windows
+/// remove_dir_all fails on read-only files — installs leave video.txt RO).
+pub fn rm_ro(dir: &std::path::Path) {
+    fn clear_ro(p: &std::path::Path) {
+        if let Ok(md) = std::fs::symlink_metadata(p) {
+            if md.permissions().readonly() {
+                let mut perms = md.permissions();
+                perms.set_readonly(false);
+                let _ = std::fs::set_permissions(p, perms);
+            }
+        }
+    }
+    fn walk(p: &std::path::Path) {
+        if let Ok(rd) = std::fs::read_dir(p) {
+            for e in rd.flatten() {
+                let ep = e.path();
+                if ep.is_dir() {
+                    walk(&ep);
+                } else {
+                    clear_ro(&ep);
+                }
+            }
+        }
+        clear_ro(p);
+    }
+    walk(dir);
+    let _ = std::fs::remove_dir_all(dir);
+}
+
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct RestoreReport {
     pub restored_gi: bool,

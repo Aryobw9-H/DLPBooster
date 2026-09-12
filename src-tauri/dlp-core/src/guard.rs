@@ -10,7 +10,7 @@ pub fn game_running() -> Vec<String> {
     }
     use sysinfo::System;
     let mut sys = System::new();
-    sys.refresh_processes(ProcessesToUpdate::All, true);
+    sys.refresh_processes(sysinfo::ProcessesToUpdate::All, true);
     let mut found = Vec::new();
     for (pid, proc_) in sys.processes() {
         let name = proc_.name().to_string_lossy().to_lowercase();
