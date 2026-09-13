@@ -503,15 +503,6 @@ function renderValvePings(servers) {
     grid.appendChild(card);
   }
 
-  // Motion: staggered entrance for ping cards
-  if (window.Motion) {
-    Motion.animate(
-      grid.querySelectorAll('.ping-card'),
-      { opacity: [0, 1], transform: ['translateY(8px)', 'translateY(0px)'] },
-      { delay: Motion.stagger(0.04), duration: 0.3, easing: 'ease-out' }
-    );
-  }
-
   if (tag) {
     if (bestPing < Infinity) {
       tag.textContent = `${t('bestServer')}${bestServerName} (${bestPing}ms)`;
@@ -520,69 +511,6 @@ function renderValvePings(servers) {
       tag.style.display = 'none';
     }
   }
-
-  renderPingChart(servers);
-}
-
-// ---------- Chart.js: live ping bar chart ----------
-let pingChart = null;
-
-function renderPingChart(servers) {
-  const grid = document.getElementById('ping-grid');
-  if (!grid || typeof Chart === 'undefined') return;
-
-  // container: insert canvas below the grid once (own flex row, never overlaps)
-  let wrap = document.getElementById('ping-chart-wrap');
-  if (!wrap) {
-    wrap = document.createElement('div');
-    wrap.id = 'ping-chart-wrap';
-    grid.parentElement.appendChild(wrap);
-    canvas = document.createElement('canvas');
-    canvas.id = 'ping-chart';
-    wrap.appendChild(canvas);
-  }
-  canvas = document.getElementById('ping-chart');
-  if (!canvas) return;
-
-  const labeled = servers.filter((s) => s.ping_ms !== null && s.ping_ms !== undefined);
-  const labels = labeled.map((s) => (state.lang === 'fa' ? s.name_fa : (s.name || s.name_en)));
-  const data = labeled.map((s) => s.ping_ms);
-  const colors = data.map((ms) => (ms < 80 ? '#4ade80' : ms < 130 ? '#38bdf8' : ms < 180 ? '#facc15' : '#f87171'));
-  const best = Math.min(...data);
-
-  if (pingChart) {
-    pingChart.data.labels = labels;
-    pingChart.data.datasets[0].data = data;
-    pingChart.data.datasets[0].backgroundColor = colors;
-    pingChart.update('none');
-    return;
-  }
-
-  pingChart = new Chart(canvas, {
-    type: 'bar',
-    data: { labels, datasets: [{ data, backgroundColor: colors, borderRadius: 6, maxBarThickness: 46 }] },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      animation: { duration: 600, easing: 'easeOutQuart' },
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: (c) => ` ${c.parsed.y} ms` } },
-      },
-      scales: {
-        x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { display: false } },
-        y: {
-          beginAtZero: true,
-          suggestedMax: Math.max(200, Math.max(...data) * 1.15),
-          ticks: { color: '#64748b', font: { size: 10 }, callback: (v) => v + 'ms' },
-          grid: { color: 'rgba(148,163,184,0.08)' },
-        },
-      },
-      barThickness: 'flex',
-      // highlight best bar with full opacity
-      elements: { bar: { borderColor: (c) => (c.parsed.y === best ? '#f97316' : 'transparent'), borderWidth: 2 } },
-    },
-  });
 }
 
 async function refreshValvePings() {
