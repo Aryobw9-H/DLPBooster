@@ -531,20 +531,18 @@ function renderPingChart(servers) {
   const grid = document.getElementById('ping-grid');
   if (!grid || typeof Chart === 'undefined') return;
 
-  // container: insert canvas below the grid once
+  // container: insert canvas below the grid once (own flex row, never overlaps)
   let wrap = document.getElementById('ping-chart-wrap');
   if (!wrap) {
     wrap = document.createElement('div');
     wrap.id = 'ping-chart-wrap';
-    wrap.style.cssText = 'height:150px;margin-top:12px;flex-shrink:0;';
     grid.parentElement.appendChild(wrap);
-  }
-  let canvas = document.getElementById('ping-chart');
-  if (!canvas) {
     canvas = document.createElement('canvas');
     canvas.id = 'ping-chart';
     wrap.appendChild(canvas);
   }
+  canvas = document.getElementById('ping-chart');
+  if (!canvas) return;
 
   const labeled = servers.filter((s) => s.ping_ms !== null && s.ping_ms !== undefined);
   const labels = labeled.map((s) => (state.lang === 'fa' ? s.name_fa : (s.name || s.name_en)));

@@ -452,6 +452,8 @@
     /* Fixed Panel Body Height for All 5 Tabs */
     .panel {
       height: 250px;
+      display: flex;
+      flex-direction: column;
       min-height: 250px;
       max-height: 250px;
       overflow-y: auto;
@@ -1388,10 +1390,26 @@ button:active,
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows: repeat(2, 1fr);
   gap: 8px;
-  flex: 1;
+  flex: 1 1 auto;
   min-height: 0;
+  overflow: hidden;
   box-sizing: border-box;
 }
+
+/* Chart.js canvas wrap: own fixed row, never overlaps the grid */
+#ping-chart-wrap {
+  height: 130px;
+  min-height: 130px;
+  flex: 0 0 130px;
+  position: relative;
+  z-index: 2;
+  background: rgba(10, 16, 27, 0.35);
+  border: 1px solid rgba(59, 130, 246, 0.12);
+  border-radius: 8px;
+  padding: 6px 8px;
+  box-sizing: border-box;
+}
+#ping-chart-wrap canvas { position: absolute; inset: 6px 8px; width: calc(100% - 16px) !important; height: calc(100% - 12px) !important; }
 
 .ping-loading-msg {
   grid-column: 1 / -1;
