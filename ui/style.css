@@ -737,49 +737,7 @@
   font-weight: 700;
 }
 
-.btn-launch {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  margin: 0 8px 0 0;
-  padding: 0 14px;
-  height: 28px;
-  min-height: 28px;
-  max-height: 28px;
-  width: 140px !important;
-  min-width: 140px !important;
-  max-width: 140px !important;
-  background: linear-gradient(135deg, rgba(249, 115, 22, 0.22) 0%, rgba(234, 88, 12, 0.12) 100%);
-  color: #fff;
-  border: 1px solid rgba(249, 115, 22, 0.55);
-  border-radius: 6px;
-  font-family: 'Dana', 'Plus Jakarta Sans', sans-serif;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-sizing: border-box;
-  flex-shrink: 0;
-  transform: none !important;
-  white-space: nowrap;
-}
-.btn-launch svg {
-  flex-shrink: 0;
-}
-.btn-launch:hover {
-  background: linear-gradient(135deg, rgba(249, 115, 22, 0.38) 0%, rgba(234, 88, 12, 0.25) 100%);
-  border-color: var(--deadlock-orange);
-  box-shadow: 0 0 14px var(--deadlock-orange-glow);
-  color: #fff;
-}
-.btn-launch.running {
-  color: var(--deadlock-cyan);
-  border-color: rgba(56, 189, 248, 0.5);
-  background: linear-gradient(135deg, rgba(56, 189, 248, 0.2) 0%, rgba(56, 189, 248, 0.08) 100%);
-  box-shadow: 0 0 12px rgba(56, 189, 248, 0.35);
-}
+/* (old .btn-launch pill removed — replaced by .btn-play octagon button) */
 
 .win-ctl {
   background: transparent;
@@ -1879,3 +1837,175 @@ button:active,
 @media (prefers-reduced-motion: reduce) {
   .cards-deck .pro-card, .ping-card { animation: none !important; }
 }
+
+/* ===================== SOCIAL FLIP-CARD BUTTONS (uiverse Praashoo7 port) ===================== */
+/* bottom-left corner cluster: telegram / youtube / website / instagram */
+.social-cluster {
+  position: fixed;
+  bottom: 14px;
+  left: 14px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.social-row { display: flex; gap: 6px; }
+.social-card {
+  width: 44px; height: 44px;
+  outline: none; border: none; cursor: pointer;
+  background: rgba(14, 23, 38, 0.75);
+  display: flex; align-items: center; justify-content: center;
+  padding: 0;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  box-shadow:
+    inset 1px 1px 1px rgba(255, 255, 255, 0.25),
+    inset -1px -1px 1px rgba(68, 66, 66, 0.25),
+    1px 1px 4px rgba(0, 0, 0, 0.35);
+}
+.social-card svg, .social-card img { width: 20px; height: 20px; display: block; }
+.social-card svg { fill: currentColor; }
+
+/* corner radii — outer corners rounded like the uiverse original */
+.social-card.tl { border-radius: 44px 5px 5px 5px; }
+.social-card.tr { border-radius: 5px 44px 5px 5px; }
+.social-card.bl { border-radius: 5px 5px 5px 44px; }
+.social-card.br { border-radius: 5px 5px 44px 5px; }
+
+.social-card:hover { box-shadow: 0 0 12px 1px var(--social-glow); }
+.social-card.tl:hover { transform: translate(-4px, -4px); }
+.social-card.tr:hover { transform: translate(4px, -4px); }
+.social-card.bl:hover { transform: translate(-4px, 4px); }
+.social-card.br:hover { transform: translate(4px, 4px); }
+.social-card:active {
+  box-shadow:
+    inset 3px 3px 6px rgba(0,0,0,0.4),
+    inset -1px -1px 1px rgba(255,255,255,0.2);
+}
+
+/* brand colors on glow */
+.social-card.telegram { --social-glow: #29b6f6; color: #29b6f6; }
+.social-card.youtube  { --social-glow: #ff0000; color: #ff0000; }
+.social-card.website  { --social-glow: #f97316; color: #f97316; }
+.social-card.instagram{ --social-glow: #cc39a4; color: #cc39a4; }
+/* website uses DLP logo instead of icon font */
+.social-card.website img { border-radius: 6px; }
+
+/* ===================== PLAY-STYLE LAUNCH BUTTON (uiverse Navarog21 port) ===================== */
+/* octagon clip frame, orbiting corner diamonds, side arrows — deadlock orange theme */
+:root { --play-c: #f97316; --play-c2: #fb923c; }
+
+.btn-play {
+  position: relative;
+  width: 11em; height: 3.4em;
+  outline: none;
+  background: transparent;
+  border: none;
+  font-family: 'Dana', 'Plus Jakarta Sans', sans-serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.35em;
+  color: #ddebf0;
+  cursor: pointer;
+  transition: 0.1s;
+  padding: 0;
+}
+.btn-play .clip {
+  --pc: var(--play-c);
+  position: absolute; top: 0; left: 0;
+  overflow: hidden;
+  width: 100%; height: 100%;
+  border: 4px double var(--pc);
+  box-shadow: inset 0 0 14px rgba(249, 115, 22, 0.55);
+  clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+  transition: 0.2s;
+  pointer-events: none;
+}
+.btn-play .arrow {
+  position: absolute;
+  transition: 0.2s;
+  background-color: var(--play-c);
+  top: 35%;
+  width: 11%; height: 30%;
+}
+.btn-play .arrow.left { left: -13.5%; clip-path: polygon(100% 0, 100% 100%, 0 50%); }
+.btn-play .arrow.right { clip-path: polygon(100% 49%, 0 0, 0 100%); left: 102%; }
+.btn-play:hover .arrow.right { background-color: var(--play-c2); left: -15%; animation: dlp-arrowR 0.6s ease-in-out both infinite alternate; }
+.btn-play:hover .arrow.left  { background-color: var(--play-c2); left: 103%; animation: dlp-arrowL 0.6s ease-in-out both infinite alternate; }
+.btn-play .corner {
+  position: absolute;
+  width: 3.2em; height: 3.2em;
+  background-color: var(--play-c);
+  box-shadow: inset 1px 1px 8px rgba(251, 146, 60, 0.9);
+  transform: scale(1) rotate(45deg);
+  transition: 0.2s;
+  pointer-events: none;
+}
+.btn-play .corner.rt { top: -1.65em; left: 91%; }
+.btn-play .corner.lt { top: -1.63em; left: -2.55em; }
+.btn-play .corner.lb { top: 1.75em; left: -1.85em; }
+.btn-play .corner.rb { top: 45%; left: 88%; }
+.btn-play:hover .corner.lt { animation: 0.1s ease-in-out 0.05s both dlp-chgColor, 0.2s linear 0.4s both dlp-lightFx; }
+.btn-play:hover .corner.rt { animation: 0.1s ease-in-out 0.15s both dlp-chgColor, 0.2s linear 0.4s both dlp-lightFx; }
+.btn-play:hover .corner.rb { animation: 0.1s ease-in-out 0.25s both dlp-chgColor, 0.2s linear 0.4s both dlp-lightFx; }
+.btn-play:hover .corner.lb { animation: 0.1s ease-in-out 0.35s both dlp-chgColor, 0.2s linear 0.4s both dlp-lightFx; }
+.btn-play:hover .corner { transform: scale(1.25) rotate(45deg); }
+.btn-play:hover .clip {
+  animation: 0.2s ease-in-out 0.55s both dlp-greenLight;
+  --pc: var(--play-c2);
+}
+@keyframes dlp-chgColor { from { background-color: var(--play-c); } to { background-color: var(--play-c2); } }
+@keyframes dlp-lightFx { from { box-shadow: 1px 1px 5px var(--play-c2); } to { box-shadow: 0 0 2px var(--play-c2); } }
+@keyframes dlp-greenLight { from {} to { box-shadow: inset 0 0 30px rgba(251, 146, 60, 0.95); } }
+@keyframes dlp-arrowL { from { transform: translateX(0); } to { transform: translateX(10px); } }
+@keyframes dlp-arrowR { from { transform: translateX(0); } to { transform: translateX(-10px); } }
+.btn-play:active .clip { transform: scale(0.97); }
+
+/* ===================== GLOW-RING APPLY BUTTON (uiverse marcelodolza port) ===================== */
+/* animated conic gradient halo behind the apply button, spins on hover */
+.btn-apply {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+}
+.btn-apply .glow-spin {
+  position: absolute;
+  inset: -6px;
+  border-radius: 14px;
+  overflow: hidden;
+  z-index: -2;
+  opacity: 0;
+  filter: blur(9px);
+  transition: opacity 0.45s linear;
+  pointer-events: none;
+}
+.btn-apply .glow-spin::before {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  margin: auto;
+  aspect-ratio: 1;
+  background-image: linear-gradient(90deg, #f97316, #fb923c, #38bdf8, #f97316);
+  animation: dlp-ring-spin 2.2s linear infinite;
+}
+.btn-apply:hover .glow-spin { opacity: 0.95; }
+@keyframes dlp-ring-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+/* soft breathing shadow layer under button */
+.btn-apply .glow-bg {
+  position: absolute;
+  inset: -6px;
+  border-radius: 14px;
+  background: rgba(249, 115, 22, 0.18);
+  box-shadow: 0 8px 26px rgba(249, 115, 22, 0.35);
+  z-index: -3;
+  opacity: 0.55;
+  transition: all 0.4s ease;
+  pointer-events: none;
+}
+.btn-apply:hover .glow-bg { opacity: 1; inset: -8px; }
+.btn-apply:hover { box-shadow: 0 0 14px 1px rgba(249, 115, 22, 0.55); }
+.btn-apply:active { transform: scale(0.98); }
+
+/* running state for the octagon play button (cyan = game already up) */
+.btn-play.running { color: var(--deadlock-cyan); }
+.btn-play.running .clip { --pc: var(--deadlock-cyan); box-shadow: inset 0 0 14px rgba(56, 189, 248, 0.6); }
+.btn-play.running .corner, .btn-play.running .arrow { background-color: var(--deadlock-cyan); box-shadow: inset 1px 1px 8px rgba(56, 189, 248, 0.9); }

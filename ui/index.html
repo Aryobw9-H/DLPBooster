@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="vendor/fontawesome/css/fontawesome.min.css" />
   <link rel="stylesheet" href="vendor/fontawesome/css/solid.min.css" />
   <link rel="stylesheet" href="vendor/fontawesome/css/regular.min.css" />
+  <link rel="stylesheet" href="vendor/fontawesome/css/brands.min.css" />
   <link rel="stylesheet" href="vendor/animate.css/animate.min.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -27,9 +28,16 @@
     </div>
     <div class="titlebar-drag-spacer" data-tauri-drag-region style="flex:1; height:100%;"></div>
     <div class="window-controls" data-tauri-drag-region="false">
-      <button class="btn-launch" id="btn-launch" onclick="launchGame()" title="اجرای بازی ددلاک / Launch Game">
-        <i class="fa-solid fa-play fa-beat" style="font-size:12px"></i>
-        <span data-i18n="launch">اجرای بازی</span>
+      <button class="btn-play" id="btn-launch" title="اجرای بازی ددلاک / Launch Game">
+        <span class="clip">
+          <span class="corner lt"></span>
+          <span class="corner rt"></span>
+          <span class="corner rb"></span>
+          <span class="corner lb"></span>
+        </span>
+        <span class="arrow left"></span>
+        <span class="arrow right"></span>
+        <span style="position:relative;z-index:2"><i class="fa-solid fa-play" style="font-size:11px;margin-inline-end:8px"></i><span data-i18n="launch">اجرای بازی</span></span>
       </button>
       <button class="lang-pill-btn" id="btn-lang-toggle" data-tauri-drag-region="false" onclick="toggleLang()" title="تغییر زبان / Switch Language">
         <span id="lang-label">EN</span>
@@ -288,6 +296,8 @@
           <div id="step-log" class="step-log"></div>
           <div style="display:flex;gap:12px;align-items:center">
             <button class="btn-apply" id="btn-install" onclick="doInstall()">
+              <span class="glow-spin"></span>
+              <span class="glow-bg"></span>
               <i class="fa-solid fa-check"></i>
               <span data-i18n="install">اعمال روی ددلاک</span>
             </button>
@@ -298,6 +308,26 @@
 
     </div>
   </main>
+
+  <!-- Social links: bottom-left corner flip cards -->
+  <div class="social-cluster" id="social-cluster">
+    <div class="social-row">
+      <button class="social-card tl telegram" data-url="https://t.me/deadlock_persian" title="Telegram: @deadlock_persian">
+        <i class="fa-brands fa-telegram-plane" style="font-size:20px"></i>
+      </button>
+      <button class="social-card tr youtube" data-url="https://www.youtube.com/@Deadlock_persian" title="YouTube: @Deadlock_persian">
+        <i class="fa-brands fa-youtube" style="font-size:20px"></i>
+      </button>
+    </div>
+    <div class="social-row">
+      <button class="social-card bl website" data-url="https://deadlockpersian.ir" title="deadlockpersian.ir">
+        <img src="assets/dlp.png" alt="DLP" />
+      </button>
+      <button class="social-card br instagram" data-url="https://www.instagram.com/DeadlockPersian" title="Instagram: DeadlockPersian">
+        <i class="fa-brands fa-instagram" style="font-size:20px"></i>
+      </button>
+    </div>
+  </div>
 
   <!-- Modal -->
   <div class="modal-overlay" id="modal" style="display:none">
@@ -312,5 +342,11 @@
   <script src="i18n/fa.js"></script>
   <script src="i18n/en.js"></script>
   <script src="app.js"></script>
+  <script>
+    // expose opener global (withGlobalTauri injects plugin APIs lazily via plugins object)
+    window.addEventListener('DOMContentLoaded', () => {
+      try { window.__OPEN_URL__ = (u) => window.__TAURI__.opener.openUrl(u); } catch (e) {}
+    });
+  </script>
 </body>
 </html>

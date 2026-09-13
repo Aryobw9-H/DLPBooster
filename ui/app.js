@@ -187,8 +187,11 @@ async function refreshRunning() {
     const running = (await call('check_running')).length > 0;
     state.running = running;
     const btn = document.getElementById('btn-launch');
-    btn.classList.toggle('running', running);
-    btn.querySelector('span').textContent = running ? t('launchRunning') : t('launch');
+    if (btn) {
+      btn.classList.toggle('running', running);
+      const label = btn.querySelector('[data-i18n="launch"]');
+      if (label) label.textContent = running ? t('launchRunning') : t('launch');
+    }
   } catch (e) { /* non-fatal */ }
 }
 
@@ -409,6 +412,23 @@ async function launchGame() {
   if (state.running) return;
   try { await call('launch_game'); } catch (e) { /* steam not found etc. */ }
   setTimeout(refreshRunning, 2000);
+}
+
+// ---------- social links: open in system browser ----------
+async function openExternal(url) {
+  // 1) Tauri opener plugin global (withGlobalTauri)
+  try {
+    const t = window.__TAURI__;
+    const op = t && (t.opener || (t.plugins && t.plugins.opener));
+    if (op) {
+      if (typeof op.openUrl === 'function') { await op.openUrl(url); return; }
+      if (typeof op.open === 'function') { await op.open(url); return; }
+    }
+  } catch (e) { /* fall through */ }
+  // 2) direct command
+  try { await call('plugin:opener|open_url', { url }); return; } catch (e) { /* fall through */ }
+  // 3) webview fallback (may be blocked, harmless)
+  try { window.open(url, '_blank'); } catch (e) {}
 }
 
 // ---------- modal ----------
@@ -714,6 +734,9 @@ function init() {
     document.getElementById('btn-pick-folder').onclick = pickFolder;
     document.getElementById('btn-confirm-path').onclick = confirmPath;
     document.getElementById('btn-launch').onclick = launchGame;
+    document.querySelectorAll('.social-card[data-url]').forEach((b) => {
+      b.onclick = () => openExternal(b.dataset.url);
+    });
     document.getElementById('btn-install').onclick = doInstall;
     document.getElementById('btn-backup').onclick = doBackupNow;
     document.getElementById('btn-revert-vanilla').onclick = doRevertVanilla;
