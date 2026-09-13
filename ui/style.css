@@ -2144,10 +2144,9 @@ button:active,
   animation: pingcard-glow 4s ease-in-out infinite;
   z-index: -1;
   pointer-events: none;
-}
+/* (inner breathing glow removed — comet border only) */
 .ping-card:hover { transform: translateY(-2px) scale(1.02); }
 .ping-card.is-best::before { animation-duration: 1.4s; }
-.ping-card.is-best::after { opacity: 0.32; }
 .ping-card .sweep {
   position: absolute;
   top: 0; left: -100%;
@@ -2161,7 +2160,6 @@ button:active,
 .ping-card:hover .sweep { left: 150%; }
 .ping-card > .ping-card-top, .ping-card > .ping-card-bottom { position: relative; z-index: 2; }
 @keyframes pingcard-rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-@keyframes pingcard-glow { 0%, 100% { opacity: 0.12; } 50% { opacity: 0.3; } }
 @media (prefers-reduced-motion: reduce) {
-  .ping-card::before, .ping-card::after { animation: none; }
+  .ping-card::before { animation: none; }
 }
