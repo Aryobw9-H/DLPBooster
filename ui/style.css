@@ -2237,13 +2237,17 @@ button:active,
 .border-beam .beam {
   position: absolute;
   top: 0; left: 0;
-  width: 40px; height: 40px;
-  background: linear-gradient(to left, #ffaa40, #38bdf8, transparent);
-  offset-path: rect(0 auto auto 0 round 8px);   /* follow border, round card corners */
-  /* offset-rotate defaults to auto: square pivots along the path */
+  width: 34px; height: 34px;
+  will-change: offset-distance;                 /* compositor-only animation */
+  background: linear-gradient(to left,
+    #ffaa40 0%,
+    #ffaa40 45%,                                /* hold orange: no early fade */
+    #38bdf8 75%,
+    transparent 100%);
+  offset-path: rect(0 auto auto 0 round 8px);
   animation: dlp-beam-run 5s linear infinite;
 }
-.tier-card-sm .border-beam .beam { width: 28px; height: 28px; }
+.tier-card-sm .border-beam .beam { width: 24px; height: 24px; }
 
 @keyframes dlp-beam-run {
   from { offset-distance: 0%; }
