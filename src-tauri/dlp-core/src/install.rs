@@ -129,6 +129,29 @@ pub fn install(mode: Mode, fov: u32, deadlock: &str, pkg: &Path, data_dir: &Path
         }
     }
 
+    // 3b) REVERT FIRST: wipe our previous install (manifest vpks, patched
+    // gameinfo.gi/video.txt, managed autoexec) so every apply starts from the
+    // user's original files — no incremental drift between modes.
+    match crate::backup::revert_original(&citadel) {
+        Ok(rep) => {
+            log.push(StepLog {
+                step: "revert".into(),
+                detail: format!(
+                    "cleaned previous install ({} addons removed)",
+                    rep.removed_addons.len()
+                ),
+                skipped: false,
+            });
+        }
+        Err(_) => {
+            log.push(StepLog {
+                step: "revert".into(),
+                detail: "no previous install found - nothing to revert".into(),
+                skipped: true,
+            });
+        }
+    }
+
     // 4) tier gameinfo.gi with per-user FOV swapped in
     let ar = crate::fov::aspect_ratio(fov);
     let src_gi = pkg.join(mode.tier_dir()).join("gameinfo.gi");
@@ -278,13 +301,28 @@ mod tests {
     }
 
     #[test]
-    fn sandbox_idempotent_second_run() {
-        let (cit, data, pkg) = sandbox("idem");
-        let deadlock = cit.parent().unwrap().parent().unwrap().to_path_buf(); // <deadlock> root
+    fn sandbox_revert_first_then_reapply() {
+        // New semantics: every apply first reverts to vanilla (deletes our
+        // manifest vpks, restores .dlp.bak gi/video) THEN applies fresh.
+        let (cit, data, pkg) = sandbox("rev");
+        let deadlock = cit.parent().unwrap().parent().unwrap().to_path_buf();
         install(Mode::T1, 90, deadlock.to_str().unwrap(), &pkg, &data).unwrap();
-        let second = install(Mode::T1, 90, deadlock.to_str().unwrap(), &pkg, &data).unwrap();
-        let gi_step = second.iter().find(|l| l.step == "gameinfo.gi").unwrap();
-        assert!(gi_step.skipped, "second run should skip identical gi: {gi_step:?}");
+        let second = install(Mode::T2, 95, deadlock.to_str().unwrap(), &pkg, &data).unwrap();
+        // revert step ran
+        let rev = second.iter().find(|l| l.step == "revert").unwrap();
+        assert!(!rev.skipped, "revert should have cleaned first install: {rev:?}");
+        // T2 gi applied (FOV 95 -> 2.32)
+        let gi = std::fs::read_to_string(cit.join("gameinfo.gi")).unwrap();
+        assert!(gi.contains("\"r_aspectratio\"\t\t\t\t\t\t\"2.32\""), "T2 gi: {gi}");
+        // addons: T1's 6 were reverted, then T2's 6 added -> manifest exactly 6
+        let man = std::fs::read_to_string(cit.join("addons_manifest.txt")).unwrap();
+        assert_eq!(man.lines().count(), 6, "manifest should be exactly T2's 6 after revert-first: {man}");
+        let vpks: Vec<String> = std::fs::read_dir(cit.join("addons")).unwrap().flatten()
+            .map(|e| e.file_name().to_string_lossy().into_owned()).collect();
+        assert_eq!(vpks.len(), 6, "vpks after revert+T2: {vpks:?}");
+        // .dlp.bak snapshots survive (permanent)
+        assert!(cit.join("gameinfo.gi.dlp.bak").is_file());
+        assert!(cit.join("cfg").join("video.txt.dlp.bak").is_file());
         crate::backup::rm_ro(cit.parent().unwrap().parent().unwrap());
     }
 
