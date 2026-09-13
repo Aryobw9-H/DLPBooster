@@ -2205,3 +2205,65 @@ button:active,
 }
 .dlp-loading .dlp-load-label { font-size: 0.8rem; color: var(--text-secondary, #94a3b8); }
 @media (prefers-reduced-motion: reduce) { .dlp-loader { animation: none; } }
+
+/* ===================== BORDER BEAM (MagicUI port) on selected tier card ===================== */
+/* A small gradient beam travels along the border of the ACTIVE tier card.
+   Pure CSS: offset-path: rect() rounds the corners of the path. */
+.tier-card { position: relative; }
+.tier-card .border-beam {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  overflow: hidden;
+}
+.tier-card.selected .border-beam { opacity: 1; }
+.tier-card .border-beam::before {
+  content: "";
+  position: absolute;
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(to left, #f97316, #38bdf8, transparent);
+  offset-path: rect(0 auto auto 0 round 8px); /* follows the 8px-radius border */
+  offset-rotate: auto; /* orient along path */
+  animation: dlp-beam-run 4s linear infinite;
+  filter: drop-shadow(0 0 6px rgba(249, 115, 22, 0.8));
+}
+.tier-card.selected .border-beam::after {
+  /* soft trailing glow that fills the border line while beam passes */
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(from var(--beam-angle, 0deg),
+    rgba(249, 115, 22, 0.55), rgba(56, 189, 248, 0.25), transparent 40%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0.6;
+}
+@keyframes dlp-beam-run {
+  from { offset-distance: 0%; }
+  to { offset-distance: 100%; }
+}
+/* TEMP mode cards too */
+.tier-card-sm { position: relative; }
+.tier-card-sm.selected .border-beam { opacity: 1; }
+.tier-card-sm .border-beam { pointer-events: none; position: absolute; inset: 0; border-radius: inherit; opacity: 0; transition: opacity 0.3s ease; }
+.tier-card-sm .border-beam::before {
+  content: "";
+  position: absolute;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(to left, #f97316, #38bdf8, transparent);
+  offset-path: rect(0 auto auto 0 round 8px);
+  animation: dlp-beam-run 4s linear infinite;
+  filter: drop-shadow(0 0 6px rgba(249, 115, 22, 0.8));
+}
+@media (prefers-reduced-motion: reduce) {
+  .tier-card .border-beam::before, .tier-card-sm .border-beam::before { animation: none; }
+}
