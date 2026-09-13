@@ -1896,18 +1896,19 @@ button:active,
 
 .btn-play {
   position: relative;
-  width: 11em; height: 3.4em;
+  width: 8.2em; height: 2.7em;
   outline: none;
   background: transparent;
   border: none;
   font-family: 'Dana', 'Plus Jakarta Sans', sans-serif;
-  font-size: 12.5px;
+  font-size: 10.5px;
   font-weight: 700;
-  letter-spacing: 0.35em;
+  letter-spacing: 0.3em;
   color: #ddebf0;
   cursor: pointer;
   transition: 0.1s;
   padding: 0;
+  flex-shrink: 0;
 }
 .btn-play .clip {
   --pc: var(--play-c);
@@ -1933,16 +1934,16 @@ button:active,
 .btn-play:hover .arrow.left  { background-color: var(--play-c2); left: 103%; animation: dlp-arrowL 0.6s ease-in-out both infinite alternate; }
 .btn-play .corner {
   position: absolute;
-  width: 3.2em; height: 3.2em;
+  width: 2.4em; height: 2.4em;
   background-color: var(--play-c);
   box-shadow: inset 1px 1px 8px rgba(251, 146, 60, 0.9);
   transform: scale(1) rotate(45deg);
   transition: 0.2s;
   pointer-events: none;
 }
-.btn-play .corner.rt { top: -1.65em; left: 91%; }
-.btn-play .corner.lt { top: -1.63em; left: -2.55em; }
-.btn-play .corner.lb { top: 1.75em; left: -1.85em; }
+.btn-play .corner.rt { top: -1.22em; left: 91%; }
+.btn-play .corner.lt { top: -1.2em; left: -1.9em; }
+.btn-play .corner.lb { top: 1.3em; left: -1.35em; }
 .btn-play .corner.rb { top: 45%; left: 88%; }
 .btn-play:hover .corner.lt { animation: 0.1s ease-in-out 0.05s both dlp-chgColor, 0.2s linear 0.4s both dlp-lightFx; }
 .btn-play:hover .corner.rt { animation: 0.1s ease-in-out 0.15s both dlp-chgColor, 0.2s linear 0.4s both dlp-lightFx; }
@@ -2009,3 +2010,173 @@ button:active,
 .btn-play.running { color: var(--deadlock-cyan); }
 .btn-play.running .clip { --pc: var(--deadlock-cyan); box-shadow: inset 0 0 14px rgba(56, 189, 248, 0.6); }
 .btn-play.running .corner, .btn-play.running .arrow { background-color: var(--deadlock-cyan); box-shadow: inset 1px 1px 8px rgba(56, 189, 248, 0.9); }
+
+/* ===================== NEON CHECKBOX (uiverse port, deadlock orange) ===================== */
+/* orange glow box + flowing borders + particle/ring/spark burst on check.
+   Replaces the old .switch toggle. Kept: burst animations while active. */
+.neon-checkbox {
+  --nc: #f97316;
+  --nc-dark: #c2570c;
+  --nc-light: #fdba74;
+  --size: 24px;
+  position: relative;
+  width: var(--size);
+  height: var(--size);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.neon-checkbox input { display: none; }
+.neon-checkbox__frame { position: relative; width: 100%; height: 100%; }
+.neon-checkbox__box {
+  position: absolute; inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 4px;
+  border: 2px solid var(--nc-dark);
+  transition: all 0.4s ease;
+}
+.neon-checkbox__check-container {
+  position: absolute; inset: 2px;
+  display: flex; align-items: center; justify-content: center;
+}
+.neon-checkbox__check {
+  width: 80%; height: 80%;
+  fill: none;
+  stroke: var(--nc);
+  stroke-width: 3;
+  stroke-linecap: round; stroke-linejoin: round;
+  stroke-dasharray: 40; stroke-dashoffset: 40;
+  transform-origin: center;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.neon-checkbox__glow {
+  position: absolute; inset: -2px;
+  border-radius: 6px;
+  background: var(--nc);
+  opacity: 0; filter: blur(8px); transform: scale(1.2);
+  transition: all 0.4s ease;
+}
+.neon-checkbox__borders { position: absolute; inset: 0; border-radius: 4px; overflow: hidden; }
+.neon-checkbox__borders span {
+  position: absolute;
+  width: 40px; height: 1px;
+  background: var(--nc);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.neon-checkbox__borders span:nth-child(1) { top: 0; left: -100%; animation: ncb-order 2s linear infinite; }
+.neon-checkbox__borders span:nth-child(2) { top: -100%; right: 0; width: 1px; height: 40px; animation: ncb-orde2 2s linear infinite; }
+.neon-checkbox__borders span:nth-child(3) { bottom: 0; right: -100%; animation: ncb-orde3 2s linear infinite; }
+.neon-checkbox__borders span:nth-child(4) { bottom: -100%; left: 0; width: 1px; height: 40px; animation: ncb-orde4 2s linear infinite; }
+.neon-checkbox__effects { position: absolute; inset: 0; pointer-events: none; }
+.neon-checkbox__particles span {
+  position: absolute;
+  width: 3px; height: 3px;
+  background: var(--nc);
+  border-radius: 50%;
+  opacity: 0;
+  top: 50%; left: 50%;
+  box-shadow: 0 0 6px var(--nc);
+}
+.neon-checkbox__rings { position: absolute; inset: -18px; pointer-events: none; }
+.neon-checkbox__rings .ring {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  border: 1px solid var(--nc);
+  opacity: 0; transform: scale(0);
+}
+.neon-checkbox__sparks span {
+  position: absolute;
+  width: 18px; height: 1px;
+  background: linear-gradient(90deg, var(--nc), transparent);
+  opacity: 0;
+}
+.neon-checkbox:hover .neon-checkbox__box { border-color: var(--nc); transform: scale(1.05); }
+.neon-checkbox input:checked ~ .neon-checkbox__frame .neon-checkbox__box {
+  border-color: var(--nc);
+  background: rgba(249, 115, 22, 0.12);
+}
+.neon-checkbox input:checked ~ .neon-checkbox__frame .neon-checkbox__check { stroke-dashoffset: 0; transform: scale(1.1); }
+.neon-checkbox input:checked ~ .neon-checkbox__frame .neon-checkbox__glow { opacity: 0.25; }
+.neon-checkbox input:checked ~ .neon-checkbox__frame .neon-checkbox__borders span { opacity: 1; }
+.neon-checkbox input:checked ~ .neon-checkbox__frame .neon-checkbox__particles span { animation: ncb-burst 0.6s ease-out forwards; }
+.neon-checkbox input:checked ~ .neon-checkbox__frame .neon-checkbox__rings .ring { animation: ncb-ring 0.6s ease-out forwards; }
+.neon-checkbox input:checked ~ .neon-checkbox__frame .neon-checkbox__sparks span { animation: ncb-spark 0.6s ease-out forwards; }
+@keyframes ncb-order { 0% { transform: translateX(0); } 100% { transform: translateX(200%); } }
+@keyframes ncb-orde2 { 0% { transform: translateY(0); } 100% { transform: translateY(200%); } }
+@keyframes ncb-orde3 { 0% { transform: translateX(0); } 100% { transform: translateX(-200%); } }
+@keyframes ncb-orde4 { 0% { transform: translateY(0); } 100% { transform: translateY(-200%); } }
+@keyframes ncb-burst {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translate(calc(-50% + var(--x, 20px)), calc(-50% + var(--y, 20px))) scale(0); opacity: 0; }
+}
+@keyframes ncb-ring { 0% { transform: scale(0); opacity: 1; } 100% { transform: scale(2); opacity: 0; } }
+@keyframes ncb-spark {
+  0% { transform: rotate(var(--r, 0deg)) translateX(0) scale(1); opacity: 1; }
+  100% { transform: rotate(var(--r, 0deg)) translateX(26px) scale(0); opacity: 0; }
+}
+/* particle positions */
+.neon-checkbox__particles span:nth-child(1) { --x: 22px; --y: -22px; }
+.neon-checkbox__particles span:nth-child(2) { --x: -22px; --y: -22px; }
+.neon-checkbox__particles span:nth-child(3) { --x: 22px; --y: 22px; }
+.neon-checkbox__particles span:nth-child(4) { --x: -22px; --y: 22px; }
+.neon-checkbox__particles span:nth-child(5) { --x: 30px; --y: 0px; }
+.neon-checkbox__particles span:nth-child(6) { --x: -30px; --y: 0px; }
+.neon-checkbox__particles span:nth-child(7) { --x: 0px; --y: 30px; }
+.neon-checkbox__particles span:nth-child(8) { --x: 0px; --y: -30px; }
+.neon-checkbox__particles span:nth-child(9) { --x: 18px; --y: -26px; }
+.neon-checkbox__particles span:nth-child(10) { --x: -18px; --y: 26px; }
+.neon-checkbox__particles span:nth-child(11) { --x: 26px; --y: 18px; }
+.neon-checkbox__particles span:nth-child(12) { --x: -26px; --y: -18px; }
+/* spark rotations */
+.neon-checkbox__sparks span:nth-child(1) { --r: 0deg; top: 50%; left: 50%; }
+.neon-checkbox__sparks span:nth-child(2) { --r: 90deg; top: 50%; left: 50%; }
+.neon-checkbox__sparks span:nth-child(3) { --r: 180deg; top: 50%; left: 50%; }
+.neon-checkbox__sparks span:nth-child(4) { --r: 270deg; top: 50%; left: 50%; }
+/* ring delays */
+.neon-checkbox__rings .ring:nth-child(2) { animation-delay: 0.1s; }
+.neon-checkbox__rings .ring:nth-child(3) { animation-delay: 0.2s; }
+
+/* ===================== WAVE-CARD PING CARDS (uiverse port) ===================== */
+/* rotating gradient waves inside each ping card + animated conic border.
+   Card size/layout unchanged — waves are absolutely positioned behind content. */
+.ping-card {
+  --pw: 1;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(rgba(11, 19, 33, 0.92), rgba(11, 19, 33, 0.92)) padding-box,
+    conic-gradient(from var(--wa, 0deg), rgba(249,115,22,0.55), rgba(56,189,248,0.35), rgba(249,115,22,0.55)) border-box;
+  animation: pingcard-border 6s linear infinite;
+}
+@keyframes pingcard-border { to { --wa: 360deg; } }
+
+.ping-card .wave {
+  position: absolute;
+  width: 320px; height: 420px;
+  opacity: 0.32;
+  left: 0; top: 0;
+  margin-left: -55%;
+  margin-top: -75%;
+  background: linear-gradient(744deg, #f97316, #ea580c 55%, #38bdf8);
+  border-radius: 40%;
+  z-index: -1;
+  animation: pingcard-wave 55s infinite linear;
+  pointer-events: none;
+}
+.ping-card .wave:nth-child(2) { animation-duration: 50s; }
+.ping-card .wave:nth-child(3) { animation-duration: 45s; }
+.ping-card.is-best .wave { opacity: 0.5; animation-duration: 12s; }
+.ping-card.is-best .wave:nth-child(2) { animation-duration: 16s; }
+.ping-card.is-best .wave:nth-child(3) { animation-duration: 20s; }
+@keyframes pingcard-wave { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+.ping-card > *:not(.wave) { position: relative; z-index: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ping-card { animation: none; }
+  .ping-card .wave { animation: none !important; }
+}

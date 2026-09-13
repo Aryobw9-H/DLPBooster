@@ -477,7 +477,6 @@ let pingingActive = false;
 
 function renderValvePings(servers) {
   const grid = document.getElementById('ping-grid');
-  const tag = document.getElementById('best-server-tag');
   if (!grid || !Array.isArray(servers)) return;
 
   grid.innerHTML = '';
@@ -508,6 +507,9 @@ function renderValvePings(servers) {
 
     const name = state.lang === 'fa' ? s.name_fa : (s.name || s.name_en);
     card.innerHTML = `
+      <div class="wave"></div>
+      <div class="wave"></div>
+      <div class="wave"></div>
       <div class="ping-card-top">
         <div class="ping-card-title">${name}</div>
         <span class="ping-code-badge">${s.id.toUpperCase()}</span>
@@ -522,19 +524,10 @@ function renderValvePings(servers) {
     `;
     grid.appendChild(card);
   }
-
-  if (tag) {
-    if (bestPing < Infinity) {
-      tag.textContent = `${t('bestServer')}${bestServerName} (${bestPing}ms)`;
-      tag.style.display = 'inline-flex';
-    } else {
-      tag.style.display = 'none';
-    }
-  }
 }
 
 async function refreshValvePings() {
-  if (pingingActive) return;
+   if (pingingActive) return;
   pingingActive = true;
   const btn = document.getElementById('btn-refresh-ping');
   const grid = document.getElementById('ping-grid');
@@ -580,6 +573,9 @@ function selectCardByKey(tabKey) {
     const pan = document.getElementById(`panel-${p}`);
     if (pan) pan.style.display = p === tabKey ? 'block' : 'none';
   }
+  // install action only applies to graphic presets — hide elsewhere
+  const footer = document.getElementById('action-footer');
+  if (footer) footer.style.display = tabKey === 'graphic' ? 'flex' : 'none';
   // Motion One: slide+fade the activated panel in (micro-interaction)
   const active = document.getElementById(`panel-${tabKey}`);
   if (active && window.Motion) {
