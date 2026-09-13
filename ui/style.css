@@ -1904,15 +1904,11 @@ button:active,
 /* website uses DLP logo instead of icon font */
 .social-card.website img { border-radius: 6px; }
 
-/* ===================== LAUNCH BUTTON — plasma sweep ===================== */
-/* Standard pill geometry; idle = subtle sheen drift, hover = plasma border
-   + play icon ignition, press = snap. Running = cyan pulse. */
+/* ===================== LAUNCH BUTTON — clean orange pill ===================== */
 .btn-play {
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(135deg, rgba(249, 115, 22, 0.16), rgba(234, 88, 12, 0.07));
-  border: 1px solid rgba(249, 115, 22, 0.45);
-  color: #fdaa6b;
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  border: none;
+  color: #fff;
   font-family: 'Dana', 'Plus Jakarta Sans', sans-serif;
   font-size: 0.8rem;
   font-weight: 700;
@@ -1925,96 +1921,25 @@ button:active,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
+  gap: 8px;
   white-space: nowrap;
-  transition: border-color 0.25s, color 0.25s, box-shadow 0.25s, transform 0.15s;
+  transition: box-shadow 0.2s, filter 0.2s, transform 0.15s;
   flex-shrink: 0;
-  isolation: isolate;
 }
-/* idle sheen drifting across every few seconds */
-.btn-play .sheen {
-  position: absolute;
-  top: 0; left: -80%;
-  width: 50%; height: 100%;
-  background: linear-gradient(100deg, transparent, rgba(255,255,255,0.10), transparent);
-  transform: skewX(-20deg);
-  animation: launch-sheen 4.5s ease-in-out infinite;
-  pointer-events: none;
-  z-index: 0;
-}
-@keyframes launch-sheen {
-  0%, 55% { left: -80%; }
-  75%, 100% { left: 160%; }
-}
-/* plasma ring on hover: two counter-rotating conic layers clipped to border */
-.btn-play .ring {
-  position: absolute;
-  inset: -60%;
-  z-index: -1;
-  background: conic-gradient(from 0deg, transparent 0 62%, #f97316 78%, #38bdf8 88%, transparent 96%);
-  opacity: 0;
-  transition: opacity 0.25s;
-  animation: launch-spin 2.4s linear infinite;
-}
-.btn-play .ring.r2 {
-  background: conic-gradient(from 180deg, transparent 0 70%, #38bdf8 84%, #f97316 94%, transparent 100%);
-  animation-duration: 3.4s;
-  animation-direction: reverse;
-}
-@keyframes launch-spin { to { transform: rotate(360deg); } }
 .btn-play:hover {
-  color: #ffd9b8;
-  border-color: rgba(249, 115, 22, 0.8);
-  box-shadow:
-    0 0 16px rgba(249, 115, 22, 0.35),
-    inset 0 0 12px rgba(249, 115, 22, 0.15);
+  box-shadow: 0 0 14px rgba(249, 115, 22, 0.5);
+  filter: brightness(1.08);
 }
-.btn-play:hover .ring { opacity: 1; }
-/* play icon ignition */
+.btn-play:active { transform: scale(0.96); }
 .btn-play .play-chip {
-  position: relative;
-  z-index: 1;
-  width: 17px; height: 17px;
-  border-radius: 50%;
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg, #f97316, #ea580c);
-  box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.5);
-  transition: box-shadow 0.25s, transform 0.25s;
+  width: 15px; height: 15px;
 }
-.btn-play .play-chip i {
-  font-size: 8px;
-  color: #fff;
-  margin-left: 1px; /* optical center of a play triangle */
-  transition: transform 0.25s;
-}
-.btn-play:hover .play-chip {
-  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.25);
-  transform: scale(1.08);
-}
-.btn-play:hover .play-chip i { transform: scale(1.15); }
-.btn-play > span:not(.ring):not(.sheen) { position: relative; z-index: 1; }
-/* press */
-.btn-play:active { transform: scale(0.96); }
-/* running: cyan + heartbeat pulse */
+.btn-play .play-chip i { font-size: 9px; color: #fff; margin-left: 1px; }
 .btn-play.running {
-  border-color: rgba(56, 189, 248, 0.6);
-  color: var(--deadlock-cyan);
-  background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(56, 189, 248, 0.05));
-  animation: running-pulse 1.8s ease-in-out infinite;
-}
-.btn-play.running .play-chip { background: linear-gradient(135deg, #38bdf8, #0284c7); }
-.btn-play.running .ring { opacity: 1; }
-.btn-play.running .ring, .btn-play.running .ring.r2 {
-  background: conic-gradient(from 0deg, transparent 0 65%, #38bdf8 80%, #7dd3fc 90%, transparent 100%);
-}
-@keyframes running-pulse {
-  0%, 100% { box-shadow: 0 0 8px rgba(56, 189, 248, 0.25); }
-  50% { box-shadow: 0 0 18px rgba(56, 189, 248, 0.45); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .btn-play .sheen, .btn-play .ring { animation: none; }
-  .btn-play.running { animation: none; }
+  background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
 }
 
 /* ===================== GLOW-RING APPLY BUTTON (uiverse marcelodolza port) ===================== */
