@@ -1912,10 +1912,10 @@ button:active,
   font-family: 'Dana', 'Plus Jakarta Sans', sans-serif;
   font-size: 0.8rem;
   font-weight: 700;
-  height: 34px;
-  min-height: 34px;
-  max-height: 34px;
-  padding: 0 16px;
+  height: 28px;
+  min-height: 28px;
+  max-height: 28px;
+  padding: 0 14px;
   border-radius: 6px;
   cursor: pointer;
   display: inline-flex;
@@ -1934,9 +1934,9 @@ button:active,
 .btn-play .play-chip {
   display: grid;
   place-items: center;
-  width: 15px; height: 15px;
+  width: 13px; height: 13px;
 }
-.btn-play .play-chip i { font-size: 9px; color: #fff; margin-left: 1px; }
+.btn-play .play-chip i { font-size: 8px; color: #fff; margin-left: 1px; }
 .btn-play.running {
   background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
   box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
