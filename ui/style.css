@@ -1860,13 +1860,16 @@ button:active,
     inset -1px -1px 1px rgba(68, 66, 66, 0.25),
     1px 1px 4px rgba(0, 0, 0, 0.35);
 }
-.social-card svg, .social-card img { width: 20px; height: 20px; display: block; }
-/* FA brand glyphs sit slightly off visual center; nudge per network */
-.social-card i { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
-.social-card .fa-telegram-plane { transform: translateX(-1px); }
-.social-card .fa-instagram { transform: translateX(1px); }
-.social-card .fa-youtube { transform: translateY(-1px); }
-.social-card.website img { transform: translateY(0); width: 22px; height: 22px; }
+/* FA brand glyphs have uneven ink; normalize each into the same optical box */
+.social-card i, .social-card img, .social-card svg {
+  display: grid; place-items: center;
+  width: 22px; height: 22px;
+  line-height: 1;
+}
+.social-card .fa-telegram-plane { font-size: 19px; transform: translateY(-1px); }  /* plane drifts up-right */
+.social-card .fa-youtube        { font-size: 20px; }                               /* wide glyph, dead center */
+.social-card .fa-instagram      { font-size: 21px; }                               /* rounded square, slightly small */
+.social-card.website img        { width: 24px; height: 24px; border-radius: 5px; } /* DLP logo */
 .social-card svg { fill: currentColor; }
 
 /* corner radii — outer corners rounded like the uiverse original */
