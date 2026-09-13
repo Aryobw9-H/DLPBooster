@@ -2113,8 +2113,8 @@ button:active,
 .neon-checkbox__rings .ring:nth-child(3) { animation-delay: 0.2s; }
 
 /* ===================== LASER-BORDER PING CARDS (uiverse Ethereal Core port) ===================== */
-/* original ping-card layout kept; adds the rotating conic laser border +
-   breathing glow + hover sweep. Dark theme. */
+/* original ping-card layout kept; adds the rotating conic comet border +
+   hover sweep. Dark theme. No inner glow. */
 .ping-card {
   position: relative;
   overflow: hidden;
@@ -2134,17 +2134,6 @@ button:active,
   animation: pingcard-rotate 3s linear infinite;
   z-index: 0;
 }
-.ping-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: conic-gradient(transparent 72%, #f97316, #38bdf8, transparent 92%);
-  filter: blur(14px);
-  opacity: 0.16;
-  animation: pingcard-glow 4s ease-in-out infinite;
-  z-index: -1;
-  pointer-events: none;
-/* (inner breathing glow removed — comet border only) */
 .ping-card:hover { transform: translateY(-2px) scale(1.02); }
 .ping-card.is-best::before { animation-duration: 1.4s; }
 .ping-card .sweep {
