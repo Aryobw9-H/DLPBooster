@@ -1854,3 +1854,23 @@ button:active,
   animation: dlp-blink 1.4s ease-in-out infinite;
 }
 @keyframes dlp-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+/* ---------- Animate.css integration + motion polish ---------- */
+/* tab cards entrance on boot (JS adds animate__animated animate__fadeInUp) */
+.cards-deck .pro-card { --animate-duration: 0.45s; }
+.cards-deck .pro-card:nth-child(2) { --animate-delay: 0.07s; }
+.cards-deck .pro-card:nth-child(3) { --animate-delay: 0.14s; }
+
+/* tier cards: quick pop when selected */
+.tier-card.selected { animation: animate__animated 0s; } /* placeholder, JS drives animate__zoomIn */
+.tier-card, .tier-card-sm { transition: transform 0.15s ease, box-shadow 0.15s ease; }
+.tier-card:hover, .tier-card-sm:hover { transform: translateY(-2px); }
+
+/* FOV summary number slide */
+.fov-summary { transition: color 0.2s ease; }
+.fov-summary.tick { color: var(--deadlock-orange); }
+
+/* reduce motion respect */
+@media (prefers-reduced-motion: reduce) {
+  .cards-deck .pro-card, .ping-card { animation: none !important; }
+}

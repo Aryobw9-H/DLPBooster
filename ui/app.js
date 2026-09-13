@@ -441,7 +441,12 @@ function setFov(v) {
   const arPrev = document.getElementById('ar-preview');
   if (arPrev) arPrev.textContent = AR_TABLE[snapped] || '2.15';
   const fovSum = document.getElementById('fov-summary');
-  if (fovSum) fovSum.textContent = `FOV ${snapped} · AR ${AR_TABLE[snapped] || '2.15'}`;
+  if (fovSum) {
+    fovSum.textContent = `FOV ${snapped} · AR ${AR_TABLE[snapped] || '2.15'}`;
+    // tick accent on change
+    fovSum.classList.add('tick');
+    setTimeout(() => fovSum.classList.remove('tick'), 220);
+  }
   document.querySelectorAll('#chips-fov .chip-btn').forEach((b) => {
     b.classList.toggle('active', Number(b.dataset.val) === snapped);
   });
@@ -498,6 +503,15 @@ function renderValvePings(servers) {
     grid.appendChild(card);
   }
 
+  // Motion: staggered entrance for ping cards
+  if (window.Motion) {
+    Motion.animate(
+      grid.querySelectorAll('.ping-card'),
+      { opacity: [0, 1], transform: ['translateY(8px)', 'translateY(0px)'] },
+      { delay: Motion.stagger(0.04), duration: 0.3, easing: 'ease-out' }
+    );
+  }
+
   if (tag) {
     if (bestPing < Infinity) {
       tag.textContent = `${t('bestServer')}${bestServerName} (${bestPing}ms)`;
@@ -506,6 +520,71 @@ function renderValvePings(servers) {
       tag.style.display = 'none';
     }
   }
+
+  renderPingChart(servers);
+}
+
+// ---------- Chart.js: live ping bar chart ----------
+let pingChart = null;
+
+function renderPingChart(servers) {
+  const grid = document.getElementById('ping-grid');
+  if (!grid || typeof Chart === 'undefined') return;
+
+  // container: insert canvas below the grid once
+  let wrap = document.getElementById('ping-chart-wrap');
+  if (!wrap) {
+    wrap = document.createElement('div');
+    wrap.id = 'ping-chart-wrap';
+    wrap.style.cssText = 'height:150px;margin-top:12px;flex-shrink:0;';
+    grid.parentElement.appendChild(wrap);
+  }
+  let canvas = document.getElementById('ping-chart');
+  if (!canvas) {
+    canvas = document.createElement('canvas');
+    canvas.id = 'ping-chart';
+    wrap.appendChild(canvas);
+  }
+
+  const labeled = servers.filter((s) => s.ping_ms !== null && s.ping_ms !== undefined);
+  const labels = labeled.map((s) => (state.lang === 'fa' ? s.name_fa : (s.name || s.name_en)));
+  const data = labeled.map((s) => s.ping_ms);
+  const colors = data.map((ms) => (ms < 80 ? '#4ade80' : ms < 130 ? '#38bdf8' : ms < 180 ? '#facc15' : '#f87171'));
+  const best = Math.min(...data);
+
+  if (pingChart) {
+    pingChart.data.labels = labels;
+    pingChart.data.datasets[0].data = data;
+    pingChart.data.datasets[0].backgroundColor = colors;
+    pingChart.update('none');
+    return;
+  }
+
+  pingChart = new Chart(canvas, {
+    type: 'bar',
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderRadius: 6, maxBarThickness: 46 }] },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 600, easing: 'easeOutQuart' },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: (c) => ` ${c.parsed.y} ms` } },
+      },
+      scales: {
+        x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { display: false } },
+        y: {
+          beginAtZero: true,
+          suggestedMax: Math.max(200, Math.max(...data) * 1.15),
+          ticks: { color: '#64748b', font: { size: 10 }, callback: (v) => v + 'ms' },
+          grid: { color: 'rgba(148,163,184,0.08)' },
+        },
+      },
+      barThickness: 'flex',
+      // highlight best bar with full opacity
+      elements: { bar: { borderColor: (c) => (c.parsed.y === best ? '#f97316' : 'transparent'), borderWidth: 2 } },
+    },
+  });
 }
 
 async function refreshValvePings() {
@@ -554,6 +633,11 @@ function selectCardByKey(tabKey) {
   for (const p of PANELS) {
     const pan = document.getElementById(`panel-${p}`);
     if (pan) pan.style.display = p === tabKey ? 'block' : 'none';
+  }
+  // Motion One: slide+fade the activated panel in (micro-interaction)
+  const active = document.getElementById(`panel-${tabKey}`);
+  if (active && window.Motion) {
+    Motion.animate(active, { opacity: [0, 1], transform: ['translateY(10px)', 'translateY(0px)'] }, { duration: 0.28, easing: 'ease-out' });
   }
   if (tabKey === 'latency') refreshValvePings();
   if (tabKey === 'advanced') renderBackups();
@@ -645,7 +729,13 @@ function updateScale() {
 function selectPreset(mode) {
   state.selectedMode = mode;
   document.querySelectorAll('.tier-card, .tier-card-sm, .option-item.preset').forEach((p) => {
+    const was = p.classList.contains('selected');
     p.classList.toggle('selected', p.dataset.mode === mode);
+    // Animate.css: pop the card when it becomes selected
+    if (!was && p.dataset.mode === mode && window.__animateStyle) {
+      p.classList.add('animate__animated', 'animate__zoomIn');
+      p.addEventListener('animationend', () => p.classList.remove('animate__animated', 'animate__zoomIn'), { once: true });
+    }
   });
 }
 
@@ -671,6 +761,16 @@ function init() {
   try {
     updateScale();
     window.addEventListener('resize', updateScale);
+    // flag Animate.css availability (loaded before app.js)
+    window.__animateStyle = !!document.querySelector('link[href*="animate.min.css"]');
+    // boot entrance: staggered card rise
+    if (window.__animateStyle) {
+      document.querySelectorAll('.cards-deck .pro-card').forEach((card, i) => {
+        card.style.setProperty('--animate-delay', `${i * 0.07}s`);
+        card.classList.add('animate__animated', 'animate__fadeInUp');
+        card.addEventListener('animationend', () => card.classList.remove('animate__animated', 'animate__fadeInUp'), { once: true });
+      });
+    }
     // window controls
     const btnMin = document.getElementById('btn-min');
     if (btnMin) btnMin.onclick = handleWinMin;
