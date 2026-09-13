@@ -1792,3 +1792,65 @@ button:active,
 }
 
 
+
+/* ---------- FontAwesome sizing + animations ---------- */
+/* FA <i> replaces old svg sizes */
+.pro-card .card-icon {
+  width: auto; height: auto;
+  font-size: 20px;
+  display: block;
+}
+.refresh-icon { font-size: 12px; }
+.btn-apply i, .btn-reset i, .btn-launch i, .win-ctl i {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* spinning refresh while pinging */
+.refresh-icon.spin { animation: fa-spin 0.9s linear infinite; }
+
+/* step-log status icons */
+.step-log .ok::before,
+.step-log .skip::before {
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  margin-inline-end: 6px;
+}
+.step-log .ok::before { content: "\f00c"; color: #4ade80; }        /* check */
+.step-log .skip::before { content: "\f12a"; color: #eab308; }      /* exclamation */
+
+/* modal title icon accent */
+.modal-title::before {
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  content: "\f0a1";   /* bullhorn */
+  margin-inline-end: 8px;
+  color: var(--deadlock-orange);
+}
+
+/* hover animations on action buttons */
+.btn-apply:hover i { animation: fa-bounce 0.6s; }
+.btn-danger:hover i { animation: fa-shake 0.7s; }
+.btn-launch:hover i { animation: fa-beat 0.7s infinite; }
+
+/* tier card pick glow pulse when selected */
+.tier-card.selected .tier-pick,
+.tier-card-sm.selected .tier-pick {
+  animation: dlp-pulse 1.6s ease-in-out infinite;
+}
+@keyframes dlp-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.55); }
+  50%      { box-shadow: 0 0 0 6px rgba(249, 115, 22, 0); }
+}
+
+/* detect badge live dot */
+.detect-badge:not(:empty)::after {
+  content: "";
+  display: inline-block;
+  width: 7px; height: 7px;
+  margin-inline-start: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: dlp-blink 1.4s ease-in-out infinite;
+}
+@keyframes dlp-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }

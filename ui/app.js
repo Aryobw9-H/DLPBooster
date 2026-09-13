@@ -513,7 +513,9 @@ async function refreshValvePings() {
   pingingActive = true;
   const btn = document.getElementById('btn-refresh-ping');
   const grid = document.getElementById('ping-grid');
+  const spinIcon = btn ? btn.querySelector('.refresh-icon') : null;
   if (btn) btn.disabled = true;
+  if (spinIcon) spinIcon.classList.add('spin');
 
   if (grid && (!state.lastValvePings || state.lastValvePings.length === 0)) {
     grid.innerHTML = `<div class="ping-loading-msg"><div class="ping-spinner"></div><span>${t('pingTesting')}</span></div>`;
@@ -530,6 +532,7 @@ async function refreshValvePings() {
     }
   } finally {
     if (btn) btn.disabled = false;
+    if (spinIcon) spinIcon.classList.remove('spin');
     pingingActive = false;
   }
 }
