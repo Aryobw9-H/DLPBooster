@@ -159,7 +159,11 @@ function syncSettingsToUi() {
 
 async function refreshGame() {
   try {
-    const found = await call('find_game');
+    // DEBUG: force the locate screen — add #pickgame to the URL or set
+    // localStorage.setItem('DLPB_DEBUG_FORCE_PICK','1'). Clear + reload to exit.
+    const forcePick = window.location.hash === '#pickgame'
+      || (typeof localStorage !== 'undefined' && localStorage.getItem('DLPB_DEBUG_FORCE_PICK') === '1');
+    const found = forcePick ? null : await call('find_game');
     if (found) {
       state.gamePath = found.deadlock;
       document.getElementById('nogame-panel').style.display = 'none';
