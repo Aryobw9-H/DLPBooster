@@ -1894,44 +1894,46 @@ button:active,
 /* website uses DLP logo instead of icon font */
 .social-card.website img { border-radius: 6px; }
 
-/* ===================== LAUNCH BUTTON — pill with arrow-swap (uiverse port, orange) ===================== */
-:root { --play-c: #f97316; --play-c2: #fb923c; }
-
+/* ===================== LAUNCH BUTTON — standard pill + MagicUI arrow-swap hover ===================== */
+/* Matches .btn-reset sizing/radius/style; keeps the arrow fly-out animation. */
 .btn-play {
-  line-height: 1;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-secondary, #94a3b8);
+  font-family: 'Dana', 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  height: 34px;
+  min-height: 34px;
+  max-height: 34px;
+  padding: 0 14px;
+  border-radius: 6px;
+  cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
-  border: none;
-  cursor: pointer;
-  background-color: var(--play-c);
-  color: #fff;
-  border-radius: 10rem;
-  font-family: 'Dana', 'Plus Jakarta Sans', sans-serif;
-  font-weight: 700;
-  font-size: 0.78rem;
-  padding: 0.42rem 0.9rem 0.42rem 0.7rem;
+  justify-content: center;
+  gap: 8px;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: background-color 0.3s;
+  transition: border-color 0.2s, color 0.2s, background-color 0.2s;
   flex-shrink: 0;
 }
 .btn-play .play-icon-wrapper {
   flex-shrink: 0;
-  width: 20px; height: 20px;
+  width: 16px; height: 16px;
   position: relative;
-  color: var(--play-c);
-  background-color: #fff;
-  border-radius: 50%;
+  color: var(--deadlock-orange);
   display: grid;
   place-items: center;
   overflow: hidden;
+  border-radius: 50%;
 }
-.btn-play .play-icon-svg { font-size: 10px; }
+.btn-play .play-icon-svg { font-size: 9px; }
 .btn-play .play-icon-copy { position: absolute; transform: translate(-150%, 150%); }
-.btn-play:hover { background-color: #1a1005; }
-.btn-play:hover .play-icon-wrapper { color: #1a1005; }
+.btn-play:hover {
+  border-color: var(--deadlock-orange);
+  color: var(--deadlock-orange);
+  background: rgba(249, 115, 22, 0.08);
+}
 .btn-play:hover .play-icon-svg:not(.play-icon-copy) {
   transition: transform 0.3s ease-in-out;
   transform: translate(150%, -150%);
@@ -1940,8 +1942,12 @@ button:active,
   transition: transform 0.3s ease-in-out 0.1s;
   transform: translate(0);
 }
-/* running state: cyan pill */
-.btn-play.running { background-color: var(--deadlock-cyan); }
+/* game running: cyan like the rest of the app's running signals */
+.btn-play.running {
+  border-color: rgba(56, 189, 248, 0.5);
+  color: var(--deadlock-cyan);
+  background: rgba(56, 189, 248, 0.08);
+}
 
 /* ===================== GLOW-RING APPLY BUTTON (uiverse marcelodolza port) ===================== */
 /* animated conic gradient halo behind the apply button, spins on hover */
