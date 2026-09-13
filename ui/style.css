@@ -1866,10 +1866,17 @@ button:active,
   width: 22px; height: 22px;
   line-height: 1;
 }
-.social-card .fa-telegram-plane { font-size: 19px; transform: translateY(-1px); }  /* plane drifts up-right */
-.social-card .fa-youtube        { font-size: 20px; }                               /* wide glyph, dead center */
-.social-card .fa-instagram      { font-size: 21px; }                               /* rounded square, slightly small */
-.social-card.website img        { width: 24px; height: 24px; border-radius: 5px; } /* DLP logo */
+/* each icon drifts toward the cluster's shared center (TL card center is
+   bottom-right of the icon cell, etc.) */
+.social-card.tl i, .social-card.tl img { transform: translate(3px, 3px); }
+.social-card.tr i, .social-card.tr img { transform: translate(-3px, 3px); }
+.social-card.bl i, .social-card.bl img { transform: translate(3px, -3px); }
+.social-card.br i, .social-card.br img { transform: translate(-3px, -3px); }
+/* glyph-specific size + fine correction on top of the drift */
+.social-card .fa-telegram-plane { font-size: 19px; }
+.social-card .fa-youtube        { font-size: 20px; }
+.social-card .fa-instagram      { font-size: 21px; }
+.social-card.website img        { width: 24px; height: 24px; border-radius: 5px; }
 .social-card svg { fill: currentColor; }
 
 /* corner radii — outer corners rounded like the uiverse original */
