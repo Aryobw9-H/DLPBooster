@@ -507,9 +507,7 @@ function renderValvePings(servers) {
 
     const name = state.lang === 'fa' ? s.name_fa : (s.name || s.name_en);
     card.innerHTML = `
-      <div class="wave"></div>
-      <div class="wave"></div>
-      <div class="wave"></div>
+      <div class="sweep"></div>
       <div class="ping-card-top">
         <div class="ping-card-title">${name}</div>
         <span class="ping-code-badge">${s.id.toUpperCase()}</span>
@@ -536,7 +534,7 @@ async function refreshValvePings() {
   if (spinIcon) spinIcon.classList.add('spin');
 
   if (grid && (!state.lastValvePings || state.lastValvePings.length === 0)) {
-    grid.innerHTML = `<div class="ping-loading-msg"><div class="ping-spinner"></div><span>${t('pingTesting')}</span></div>`;
+    grid.innerHTML = `<div class="dlp-loading"><div class="dlp-loader"><div class="l1"><div class="l2"><div class="l3"></div></div></div></div><span class="dlp-load-label">${t('pingTesting')}</span></div>`;
   }
 
   try {

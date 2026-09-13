@@ -29,15 +29,11 @@
     <div class="titlebar-drag-spacer" data-tauri-drag-region style="flex:1; height:100%;"></div>
     <div class="window-controls" data-tauri-drag-region="false">
       <button class="btn-play" id="btn-launch" title="اجرای بازی ددلاک / Launch Game">
-        <span class="clip">
-          <span class="corner lt"></span>
-          <span class="corner rt"></span>
-          <span class="corner rb"></span>
-          <span class="corner lb"></span>
+        <span class="play-icon-wrapper">
+          <i class="fa-solid fa-arrow-right play-icon-svg"></i>
+          <i class="fa-solid fa-arrow-right play-icon-svg play-icon-copy"></i>
         </span>
-        <span class="arrow left"></span>
-        <span class="arrow right"></span>
-        <span style="position:relative;z-index:2"><i class="fa-solid fa-play" style="font-size:11px;margin-inline-end:8px"></i><span data-i18n="launch">اجرای بازی</span></span>
+        <span data-i18n="launch">اجرای بازی</span>
       </button>
       <button class="lang-pill-btn" id="btn-lang-toggle" data-tauri-drag-region="false" onclick="toggleLang()" title="تغییر زبان / Switch Language">
         <span id="lang-label">EN</span>
@@ -99,24 +95,21 @@
           <div class="card-icon-wrap">
             <i class="fa-solid fa-desktop card-icon"></i>
           </div>
-          <div class="card-title" data-i18n="cardGraphic">تنظیمات گرافیکی</div>
-          <div class="card-desc" data-i18n="cardGraphicDesc">پریست‌های کیفیت تصویر و زاویه دید</div>
+          <div class="card-title" data-i18n="cardGraphic">Graphic Settings</div>
         </div>
 
         <div class="pro-card" id="card-latency">
           <div class="card-icon-wrap">
             <i class="fa-solid fa-bolt card-icon"></i>
           </div>
-          <div class="card-title" data-i18n="cardLatency">پاسخ‌دهی و تاخیر</div>
-          <div class="card-desc" data-i18n="cardLatencyDesc">بهینه‌سازی تاخیر ورودی و فریم ریت</div>
+          <div class="card-title" data-i18n="cardLatency">Latency</div>
         </div>
 
         <div class="pro-card" id="card-advanced">
           <div class="card-icon-wrap">
             <i class="fa-solid fa-sliders card-icon"></i>
           </div>
-          <div class="card-title" data-i18n="cardAdvanced">تنظیمات پیشرفته</div>
-          <div class="card-desc" data-i18n="cardAdvancedDesc">بکاپ، بازگردانی بازی اصلی، اتواگزک</div>
+          <div class="card-title" data-i18n="cardAdvanced">Advanced</div>
         </div>
 
       </section>

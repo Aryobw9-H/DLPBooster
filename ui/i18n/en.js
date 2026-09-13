@@ -13,7 +13,7 @@ window.I18N_EN = {
   pathPlaceholder: "e.g. D:\\SteamLibrary\\steamapps\\common\\Deadlock",
   confirmPath: "Use this folder",
   // cards
-  cardGraphic: "Graphic Setting",
+  cardGraphic: "Graphic Settings",
   cardGraphicDesc: "Fidelity presets & Field of View (FOV)",
   cardLatency: "Latency",
   cardLatencyDesc: "Input lag & response optimization",
