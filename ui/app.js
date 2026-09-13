@@ -237,7 +237,7 @@ async function updateDetectBadge() {
   try { res = await call('detect_tier_cmd', { citadel: cit }); } catch (e) { return; }
   const badge = document.getElementById('detect-badge');
   if (res === 'T1' || res === 'T2' || res === 'T3') {
-    badge.textContent = (res === 'T3' ? `POTATO (${res}) ` : `${res} `) + t('currentTier');
+    badge.textContent = `${res} ` + t('currentTier');
     badge.style.color = 'var(--deadlock-orange)';
   } else if (res === 'MISSING') {
     badge.textContent = t('currentMissing');
@@ -578,6 +578,8 @@ function selectCardByKey(tabKey) {
   if (active && window.Motion) {
     Motion.animate(active, { opacity: [0, 1], transform: ['translateY(10px)', 'translateY(0px)'] }, { duration: 0.28, easing: 'ease-out' });
   }
+  const badge = document.getElementById('detect-badge');
+  if (badge) badge.style.display = tabKey === 'graphic' ? '' : 'none';
   if (tabKey === 'latency') refreshValvePings();
   if (tabKey === 'advanced') renderBackups();
 }
