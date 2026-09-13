@@ -190,6 +190,7 @@
                 <input type="range" id="fov-slider" min="70" max="120" step="5" value="90" class="fov-range-input" />
                 <span class="fov-bound">120°</span>
                 <input type="number" id="fov-number" min="70" max="120" step="5" value="90" dir="ltr" class="path-input fov-num-input" />
+                <span class="fov-summary" id="fov-summary" dir="ltr">FOV 90 · AR 2.15</span>
               </div>
 
               <!-- Quick Chips Group -->
@@ -286,7 +287,6 @@
         <div class="action-footer">
           <div id="step-log" class="step-log"></div>
           <div style="display:flex;gap:12px;align-items:center">
-            <span class="fov-summary" id="fov-summary" dir="ltr">FOV 90 · AR 2.15</span>
             <button class="btn-apply" id="btn-install" onclick="doInstall()">
               <i class="fa-solid fa-check"></i>
               <span data-i18n="install">اعمال روی ددلاک</span>
