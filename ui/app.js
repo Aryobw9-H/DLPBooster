@@ -507,7 +507,6 @@ function renderValvePings(servers) {
 
     const name = state.lang === 'fa' ? s.name_fa : (s.name || s.name_en);
     card.innerHTML = `
-      <div class="sweep"></div>
       <div class="ping-card-top">
         <div class="ping-card-title">${name}</div>
         <span class="ping-code-badge">${s.id.toUpperCase()}</span>

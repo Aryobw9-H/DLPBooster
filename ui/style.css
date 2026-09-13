@@ -451,14 +451,12 @@
 
     /* Fixed Panel Body Height for All 5 Tabs */
     .panel {
-      height: 250px;
+      flex: 1 1 auto;
+      min-height: 0;
       display: flex;
       flex-direction: column;
-      min-height: 250px;
-      max-height: 250px;
       overflow-y: auto;
       overflow-x: hidden;
-      flex-shrink: 0;
       box-sizing: border-box;
       direction: ltr !important;
       padding-right: 4px;
@@ -2112,43 +2110,98 @@ button:active,
 .neon-checkbox__rings .ring:nth-child(2) { animation-delay: 0.1s; }
 .neon-checkbox__rings .ring:nth-child(3) { animation-delay: 0.2s; }
 
-/* ===================== LASER-BORDER PING CARDS (uiverse Ethereal Core port) ===================== */
-/* original ping-card layout kept; adds the rotating conic comet border +
-   hover sweep. Dark theme. No inner glow. */
+/* ===================== GLOW PING CARDS ===================== */
+/* original layout + soft rotating glow layers only (no comet border) */
 .ping-card {
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  border: 1px solid transparent;
-  background:
-    linear-gradient(rgba(11, 19, 33, 0.94), rgba(11, 19, 33, 0.94)) padding-box,
-    linear-gradient(rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.2)) border-box;
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
+  background: rgba(11, 19, 33, 0.75);
+  border: 1px solid rgba(59, 130, 246, 0.16);
+  border-radius: 8px;
+  transition: all 0.2s ease;
 }
 .ping-card::before {
   content: "";
   position: absolute;
-  width: 200%; height: 200%;
-  top: -50%; left: -50%;
-  background: conic-gradient(transparent 72%, #f97316, #38bdf8, transparent 92%);
-  animation: pingcard-rotate 3s linear infinite;
-  z-index: 0;
-}
-.ping-card:hover { transform: translateY(-2px) scale(1.02); }
-.ping-card.is-best::before { animation-duration: 1.4s; }
-.ping-card .sweep {
-  position: absolute;
-  top: 0; left: -100%;
-  width: 50%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.14), transparent);
-  transform: skewX(-25deg);
-  transition: 0.8s;
+  width: 260%; height: 260%;
+  top: -80%; left: -80%;
+  background: conic-gradient(
+    rgba(249, 115, 22, 0.16),
+    rgba(56, 189, 248, 0.12),
+    rgba(249, 115, 22, 0.16)
+  );
+  filter: blur(18px);
+  animation: pingcard-rotate 8s linear infinite;
+  z-index: -1;
   pointer-events: none;
-  z-index: 3;
 }
-.ping-card:hover .sweep { left: 150%; }
-.ping-card > .ping-card-top, .ping-card > .ping-card-bottom { position: relative; z-index: 2; }
+.ping-card:hover { background: rgba(18, 29, 49, 0.9); transform: translateY(-2px); }
+.ping-card.is-best::before { opacity: 1.4; }
 @keyframes pingcard-rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) {
   .ping-card::before { animation: none; }
 }
+
+/* ===================== ORBIT LOADER (uiverse port, deadlock orange) ===================== */
+/* 3 nested rotating frames, each drops a bouncing orange orb.
+   Frames get explicit inset:0 (inherit-width trick collapses on nested divs). */
+.dlp-loader {
+  --orb: #c2570c;
+  --orb-lite: #fdba74;
+  position: relative;
+  width: 2.2em; height: 2.2em;
+  font-size: 16px;
+  transform-origin: center;
+  border-radius: 50px;
+  box-shadow:
+    inset 0 0 10px var(--orb),
+    inset 5px 5px 12px rgba(194, 87, 12, 0.8),
+    inset 8px 8px 1px rgba(253, 186, 116, 0.7),
+    0 0 1px rgba(253, 186, 116, 0.6);
+  animation: dlp-load-spin 1.2s linear infinite running;
+}
+.dlp-loader div {
+  position: absolute;
+  inset: 0;
+  border-radius: 50px;
+}
+.dlp-loader .l1, .dlp-loader .l2, .dlp-loader .l3 { transform: rotate(90deg); }
+.dlp-loader .l1::before, .dlp-loader .l2::before, .dlp-loader .l3::before, .dlp-loader::after {
+  content: "";
+  position: absolute;
+  top: 100%; left: calc(50% - 0.5em);
+  width: 1em; height: 1em;
+  background-color: var(--orb);
+  box-shadow: inset 5px 5px 10px var(--orb-lite), 0 0 2px #fff;
+  border-radius: 50px;
+}
+.dlp-loader .l1::before { animation: 0.8s ease-in 0s infinite running dlp-load-jump; }
+.dlp-loader .l2::before { animation: 1.5s ease-in 0s infinite running dlp-load-jump; }
+.dlp-loader .l3::before { animation: 1.6s ease-in 0s infinite running dlp-load-jump; }
+.dlp-loader::after { animation: 1.2s ease-in 1s alternate infinite running dlp-load-jump; }
+@keyframes dlp-load-spin {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(90deg); }
+  50% { transform: rotate(180deg); }
+  75% { transform: rotate(270deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes dlp-load-jump {
+  0% { top: 100%; }
+  25% { top: 230%; }
+  50% { top: 100%; }
+  75% { height: 0.6em; }
+  100% { height: 1em; }
+}
+.dlp-loading {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 16px 0;
+}
+.dlp-loading .dlp-load-label { font-size: 0.8rem; color: var(--text-secondary, #94a3b8); }
+@media (prefers-reduced-motion: reduce) { .dlp-loader { animation: none; } }
