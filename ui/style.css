@@ -2206,64 +2206,49 @@ button:active,
 .dlp-loading .dlp-load-label { font-size: 0.8rem; color: var(--text-secondary, #94a3b8); }
 @media (prefers-reduced-motion: reduce) { .dlp-loader { animation: none; } }
 
-/* ===================== BORDER BEAM (MagicUI port) on selected tier card ===================== */
-/* A small gradient beam travels along the border of the ACTIVE tier card.
-   Pure CSS: offset-path: rect() rounds the corners of the path. */
-.tier-card { position: relative; }
-.tier-card .border-beam {
+/* ===================== BORDER BEAM (MagicUI faithful port) ===================== */
+/* Small gradient square travels the border via offset-path.
+   The container is masked so ONLY the 1px border ring is visible —
+   the beam appears as a comet segment running the border line. */
+.tier-card, .tier-card-sm { position: relative; }
+
+.border-beam {
   pointer-events: none;
   position: absolute;
   inset: 0;
   border-radius: inherit;
+  border: 1px solid transparent;               /* the ring the beam runs on */
   opacity: 0;
   transition: opacity 0.3s ease;
-  overflow: hidden;
+  -webkit-mask:
+    linear-gradient(transparent, transparent),
+    linear-gradient(#000, #000);
+  -webkit-mask-clip: padding-box, border-box;
+  -webkit-mask-composite: source-in;            /* intersect: keep border ring only */
+  mask:
+    linear-gradient(transparent, transparent),
+    linear-gradient(#000, #000);
+  mask-clip: padding-box, border-box;
+  mask-composite: intersect;
 }
-.tier-card.selected .border-beam { opacity: 1; }
-.tier-card .border-beam::before {
-  content: "";
+.tier-card.selected .border-beam,
+.tier-card-sm.selected .border-beam { opacity: 1; }
+
+.border-beam .beam {
   position: absolute;
-  width: 42px; height: 42px;
-  border-radius: 50%;
-  background: linear-gradient(to left, #f97316, #38bdf8, transparent);
-  offset-path: rect(0 auto auto 0 round 8px); /* follows the 8px-radius border */
-  offset-rotate: auto; /* orient along path */
-  animation: dlp-beam-run 4s linear infinite;
-  filter: drop-shadow(0 0 6px rgba(249, 115, 22, 0.8));
+  top: 0; left: 0;
+  width: 40px; height: 40px;
+  background: linear-gradient(to left, #ffaa40, #38bdf8, transparent);
+  offset-path: rect(0 auto auto 0 round 8px);   /* follow border, round card corners */
+  /* offset-rotate defaults to auto: square pivots along the path */
+  animation: dlp-beam-run 5s linear infinite;
 }
-.tier-card.selected .border-beam::after {
-  /* soft trailing glow that fills the border line while beam passes */
-  content: "";
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  padding: 1px;
-  background: conic-gradient(from var(--beam-angle, 0deg),
-    rgba(249, 115, 22, 0.55), rgba(56, 189, 248, 0.25), transparent 40%);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  mask-composite: exclude;
-  opacity: 0.6;
-}
+.tier-card-sm .border-beam .beam { width: 28px; height: 28px; }
+
 @keyframes dlp-beam-run {
   from { offset-distance: 0%; }
-  to { offset-distance: 100%; }
-}
-/* TEMP mode cards too */
-.tier-card-sm { position: relative; }
-.tier-card-sm.selected .border-beam { opacity: 1; }
-.tier-card-sm .border-beam { pointer-events: none; position: absolute; inset: 0; border-radius: inherit; opacity: 0; transition: opacity 0.3s ease; }
-.tier-card-sm .border-beam::before {
-  content: "";
-  position: absolute;
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  background: linear-gradient(to left, #f97316, #38bdf8, transparent);
-  offset-path: rect(0 auto auto 0 round 8px);
-  animation: dlp-beam-run 4s linear infinite;
-  filter: drop-shadow(0 0 6px rgba(249, 115, 22, 0.8));
+  to   { offset-distance: 100%; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .tier-card .border-beam::before, .tier-card-sm .border-beam::before { animation: none; }
+  .border-beam .beam { animation: none; }
 }
