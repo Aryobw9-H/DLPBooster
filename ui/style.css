@@ -1845,11 +1845,11 @@ button:active,
   z-index: 50;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 3px;
 }
-.social-row { display: flex; gap: 6px; }
+.social-row { display: flex; gap: 3px; }
 .social-card {
-  width: 44px; height: 44px;
+  width: 40px; height: 40px;
   outline: none; border: none; cursor: pointer;
   background: rgba(14, 23, 38, 0.75);
   display: flex; align-items: center; justify-content: center;
@@ -1870,10 +1870,10 @@ button:active,
 .social-card svg { fill: currentColor; }
 
 /* corner radii — outer corners rounded like the uiverse original */
-.social-card.tl { border-radius: 44px 5px 5px 5px; }
-.social-card.tr { border-radius: 5px 44px 5px 5px; }
-.social-card.bl { border-radius: 5px 5px 5px 44px; }
-.social-card.br { border-radius: 5px 5px 44px 5px; }
+.social-card.tl { border-radius: 40px 5px 5px 5px; }
+.social-card.tr { border-radius: 5px 40px 5px 5px; }
+.social-card.bl { border-radius: 5px 5px 5px 40px; }
+.social-card.br { border-radius: 5px 5px 40px 5px; }
 
 .social-card:hover { box-shadow: 0 0 12px 1px var(--social-glow); }
 .social-card.tl:hover { transform: translate(-4px, -4px); }
