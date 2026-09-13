@@ -75,7 +75,7 @@ pub fn do_backup(citadel: &Path, data_dir: &Path) -> Result<String, String> {
     std::fs::create_dir_all(&target).map_err(|e| e.to_string())?;
 
     let mut copied = 0usize;
-    let mut copy_one = |src: &Path, name: &str| -> usize {
+    let copy_one = |src: &Path, name: &str| -> usize {
         if src.is_file() {
             let _ = std::fs::copy(src, target.join(name));
             1
@@ -169,6 +169,74 @@ pub fn restore(citadel: &Path, data_dir: &Path, name: &str) -> Result<RestoreRep
     Ok(rep)
 }
 
+/// Restore user's original vanilla files from permanent DLP snapshots (.dlp.bak)
+/// and remove addons installed by DLP Booster (tracked in addons_manifest.txt).
+/// Managed autoexec block is also removed.
+/// Snapshots (.dlp.bak) are permanent and never deleted.
+pub fn revert_original(citadel: &Path) -> Result<RestoreReport, String> {
+    let mut rep = RestoreReport {
+        restored_gi: false,
+        restored_video: false,
+        removed_addons: vec![],
+        restored_addons: 0,
+    };
+
+    // 1) gameinfo.gi from gameinfo.gi.dlp.bak
+    let gi_bak = citadel.join("gameinfo.gi.dlp.bak");
+    if gi_bak.is_file() {
+        std::fs::copy(&gi_bak, citadel.join("gameinfo.gi")).map_err(|e| e.to_string())?;
+        rep.restored_gi = true;
+    }
+
+    // 2) video.txt from video.txt.dlp.bak
+    let vd = citadel.join("cfg").join("video.txt");
+    let vd_bak = citadel.join("cfg").join("video.txt.dlp.bak");
+    if vd_bak.is_file() {
+        if vd.exists() {
+            set_readonly(&vd, false).map_err(|e| e.to_string())?;
+        }
+        std::fs::create_dir_all(vd.parent().unwrap()).map_err(|e| e.to_string())?;
+        std::fs::copy(&vd_bak, &vd).map_err(|e| e.to_string())?;
+        // Left writable (stock behavior)
+        rep.restored_video = true;
+    }
+
+    // 3) addons from manifest
+    let man = citadel.join("addons_manifest.txt");
+    if man.is_file() {
+        let content = std::fs::read_to_string(&man).map_err(|e| e.to_string())?;
+        for ln in content.lines() {
+            let n = ln.trim();
+            if n.is_empty() {
+                continue;
+            }
+            let p = citadel.join("addons").join(n);
+            if p.is_file() {
+                let _ = std::fs::remove_file(&p);
+                rep.removed_addons.push(n.to_string());
+            }
+        }
+        let _ = std::fs::remove_file(&man);
+    }
+
+    // 4) autoexec: strip managed block if present
+    let ae = citadel.join("cfg").join("autoexec.cfg");
+    if ae.is_file() {
+        if let Ok(existing) = std::fs::read_to_string(&ae) {
+            let stripped = crate::kvedit::upsert_autoexec(&existing, false);
+            if stripped != existing {
+                let _ = std::fs::write(&ae, stripped);
+            }
+        }
+    }
+
+    if !rep.restored_gi && !rep.restored_video && rep.removed_addons.is_empty() {
+        return Err("nothing to revert - no .dlp.bak snapshots or addons manifest found".into());
+    }
+
+    Ok(rep)
+}
+
 pub fn set_readonly(p: &Path, ro: bool) -> std::io::Result<()> {
     let mut perms = std::fs::metadata(p)?.permissions();
     perms.set_readonly(ro);
@@ -256,5 +324,36 @@ mod tests {
         assert_eq!(v[0], "backup_2026-09-12_101010");
         assert_eq!(v[2], "backup_2026-01-01_000001");
         let _ = std::fs::remove_dir_all(&data);
+    }
+
+    #[test]
+    fn revert_original_roundtrip() {
+        let cit = mkcit("revert_rt");
+        // Snapshots exist
+        std::fs::write(cit.join("gameinfo.gi.dlp.bak"), b"GI-ORIGINAL").unwrap();
+        std::fs::write(cit.join("cfg").join("video.txt.dlp.bak"), b"VIDEO-ORIGINAL").unwrap();
+        // Mutated state
+        std::fs::write(cit.join("gameinfo.gi"), b"GI-MODIFIED").unwrap();
+        std::fs::write(cit.join("cfg").join("video.txt"), b"VIDEO-MODIFIED").unwrap();
+        set_readonly(&cit.join("cfg").join("video.txt"), true).unwrap();
+        std::fs::write(cit.join("addons_manifest.txt"), "pak04_dir.vpk\n").unwrap();
+        std::fs::write(cit.join("addons").join("pak04_dir.vpk"), b"VPK").unwrap();
+
+        let rep = revert_original(&cit).unwrap();
+        assert!(rep.restored_gi);
+        assert!(rep.restored_video);
+        assert_eq!(rep.removed_addons, vec!["pak04_dir.vpk"]);
+        assert_eq!(std::fs::read(cit.join("gameinfo.gi")).unwrap(), b"GI-ORIGINAL");
+        assert_eq!(std::fs::read(cit.join("cfg").join("video.txt")).unwrap(), b"VIDEO-ORIGINAL");
+        // Readonly flag must be cleared
+        assert!(!std::fs::metadata(cit.join("cfg").join("video.txt")).unwrap().permissions().readonly());
+        // Manifest must be deleted and addon removed
+        assert!(!cit.join("addons_manifest.txt").exists());
+        assert!(!cit.join("addons").join("pak04_dir.vpk").exists());
+        // Snapshots remain permanent
+        assert!(cit.join("gameinfo.gi.dlp.bak").is_file());
+        assert!(cit.join("cfg").join("video.txt.dlp.bak").is_file());
+
+        let _ = std::fs::remove_dir_all(&cit);
     }
 }

@@ -10,19 +10,24 @@
     "withGlobalTauri": true,
     "windows": [
       {
+        "label": "main",
         "title": "DLP Booster \u2014 Deadlock FPS",
         "width": 1200,
         "height": 800,
-        "resizable": true
+        "minWidth": 960,
+        "minHeight": 600,
+        "resizable": true,
+        "devtools": true,
+        "decorations": false
       }
     ],
     "security": {
-      "csp": "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; script-src 'self' 'unsafe-inline'"
+      "csp": null
     }
   },
   "bundle": {
     "active": true,
-    "targets": "all",
+    "targets": ["nsis"],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -30,7 +35,13 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "createUpdaterArtifacts": true
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser",
+        "installerHooks": "nsis_hooks.nsh"
+      }
+    },
+    "createUpdaterArtifacts": false
   },
   "plugins": {
     "updater": {

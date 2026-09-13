@@ -9,11 +9,30 @@ pub struct Settings {
     pub unlocked: bool,   // tester TEMP modes unlocked
     pub last_path: Option<String>,
     pub unit_status_new: bool, // citadel_unit_status_use_new autoexec block
+    pub reflex_mode: u8,       // 0: default/off, 1: on, 2: on+boost
+    pub fps_max: u32,          // 0: uncapped
+    pub vsync: bool,           // false
+    pub reduce_flash: bool,    // true
+    pub texture_bias: u8,      // 0 = preset default, 4 = heavy, 6 = med, 8 = light, 10 = potato
+    pub ragdoll_gib_limit: bool, // true
+    pub custom_autoexec: String, // custom user lines
 }
 
 impl Default for Settings {
     fn default() -> Self {
-        Settings { lang: "fa".into(), unlocked: false, last_path: None, unit_status_new: false }
+        Settings {
+            lang: "fa".into(),
+            unlocked: false,
+            last_path: None,
+            unit_status_new: false,
+            reflex_mode: 1,
+            fps_max: 0,
+            vsync: false,
+            reduce_flash: true,
+            texture_bias: 0,
+            ragdoll_gib_limit: true,
+            custom_autoexec: String::new(),
+        }
     }
 }
 
@@ -31,10 +50,6 @@ pub fn data_dir() -> PathBuf {
     }
     #[cfg(not(windows))]
     dirs::home_dir().unwrap_or_else(std::env::temp_dir).join(".dlpbooster")
-}
-
-fn settings_path() -> PathBuf {
-    data_dir().join("settings.json")
 }
 
 fn load_from(dir: &PathBuf) -> Settings {
@@ -71,6 +86,13 @@ mod tests {
         assert!(!s.unlocked);
         assert!(s.last_path.is_none());
         assert!(!s.unit_status_new);
+        assert_eq!(s.reflex_mode, 1);
+        assert_eq!(s.fps_max, 0);
+        assert!(!s.vsync);
+        assert!(s.reduce_flash);
+        assert_eq!(s.texture_bias, 0);
+        assert!(s.ragdoll_gib_limit);
+        assert!(s.custom_autoexec.is_empty());
         crate::backup::rm_ro(&tmp);
     }
 
@@ -78,13 +100,32 @@ mod tests {
     fn save_reload_roundtrip() {
         let tmp = std::env::temp_dir().join("dlpb_settings_rt");
         crate::backup::rm_ro(&tmp);
-        let s = Settings { lang: "en".into(), unlocked: true, last_path: Some("D:\\SteamLibrary\\steamapps\\common\\Deadlock".into()), unit_status_new: true };
+        let s = Settings {
+            lang: "en".into(),
+            unlocked: true,
+            last_path: Some("D:\\SteamLibrary\\steamapps\\common\\Deadlock".into()),
+            unit_status_new: true,
+            reflex_mode: 2,
+            fps_max: 165,
+            vsync: true,
+            reduce_flash: false,
+            texture_bias: 4,
+            ragdoll_gib_limit: false,
+            custom_autoexec: "bind f6 kill".into(),
+        };
         save_to(&tmp, &s).unwrap();
         let s2 = load_from(&tmp);
         assert_eq!(s2.lang, "en");
         assert!(s2.unlocked);
         assert_eq!(s2.last_path.as_deref(), Some("D:\\SteamLibrary\\steamapps\\common\\Deadlock"));
         assert!(s2.unit_status_new);
+        assert_eq!(s2.reflex_mode, 2);
+        assert_eq!(s2.fps_max, 165);
+        assert!(s2.vsync);
+        assert!(!s2.reduce_flash);
+        assert_eq!(s2.texture_bias, 4);
+        assert!(!s2.ragdoll_gib_limit);
+        assert_eq!(s2.custom_autoexec, "bind f6 kill");
         crate::backup::rm_ro(&tmp);
     }
 

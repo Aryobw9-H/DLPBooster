@@ -2,17 +2,29 @@
 /* global I18N_FA, I18N_EN */
 // window.__TAURI__ is injected asynchronously; NEVER destructure it at
 // top level — one throw here kills every panel. Lazy access instead.
-let _ipc = null;
-function ipc() {
-  if (_ipc) return _ipc;
-  const t = window.__TAURI__;
-  if (!t || !t.core) throw new Error('tauri ipc not ready');
-  _ipc = { invoke: t.core.invoke };
-  return _ipc;
+function getInvoke() {
+  if (window.__TAURI__ && window.__TAURI__.core && typeof window.__TAURI__.core.invoke === 'function') {
+    return window.__TAURI__.core.invoke;
+  }
+  if (window.__TAURI_INTERNALS__ && typeof window.__TAURI_INTERNALS__.invoke === 'function') {
+    return window.__TAURI_INTERNALS__.invoke;
+  }
+  if (window.__TAURI__ && typeof window.__TAURI__.invoke === 'function') {
+    return window.__TAURI__.invoke;
+  }
+  return null;
 }
+
 function call(cmd, args) {
-  try { return ipc().invoke(cmd, args); }
-  catch (e) { return Promise.reject(e); }
+  const inv = getInvoke();
+  if (!inv) {
+    console.warn('[IPC WARNING] invoke not available, command:', cmd);
+    return Promise.reject(new Error('tauri ipc not ready'));
+  }
+  return inv(cmd, args).catch((err) => {
+    console.error(`[IPC ERROR] ${cmd}:`, err);
+    return Promise.reject(err);
+  });
 }
 
 // ---------- state ----------
@@ -24,6 +36,15 @@ const state = {
   fov: 90,
   selectedMode: null,
   running: false,
+  unitStatusNew: false,
+  reflexMode: 1,
+  fpsMax: 0,
+  vsync: false,
+  reduceFlash: true,
+  textureBias: 0,
+  ragdollGibLimit: true,
+  customAutoexec: '',
+  lastValvePings: null,
 };
 
 // FOV->aspect ratio map (fov.rs parity)
@@ -36,16 +57,19 @@ function t(key) {
 
 function applyLang() {
   document.documentElement.lang = state.lang;
-  document.documentElement.dir = state.lang === 'fa' ? 'rtl' : 'ltr';
+  document.documentElement.dir = 'ltr'; // Strictly pinned LTR: layout/buttons never jump
   document.querySelectorAll('[data-i18n]').forEach((el) => {
     el.textContent = t(el.dataset.i18n);
   });
   const u = document.getElementById('unlock-input');
   const p = document.getElementById('path-input');
+  const lbl = document.getElementById('lang-label');
+  if (lbl) lbl.textContent = t('langToggle');
   if (u) u.placeholder = t('unlockPlaceholder');
   if (p) p.placeholder = t('pathPlaceholder');
   renderBackups();
   updateDetectBadge();
+  if (state.lastValvePings) renderValvePings(state.lastValvePings);
 }
 
 function setLang(lang) {
@@ -56,28 +80,44 @@ function setLang(lang) {
 
 // ---------- fatal-error surface (never silent) ----------
 function fatal(err) {
-  const d = document.createElement('pre');
-  d.style.cssText = 'color:#f87171;padding:12px;direction:ltr;text-align:left;white-space:pre-wrap;font-size:12px;position:relative;z-index:999';
-  d.textContent = 'app.js error: ' + ((err && err.stack) || err);
-  document.body.appendChild(d);
+  console.error('[DLPBooster fatal]', err);
+  let d = document.getElementById('dlp-fatal-banner');
+  if (!d && document.body) {
+    d = document.createElement('pre');
+    d.id = 'dlp-fatal-banner';
+    d.style.cssText = 'color:#f87171;background:#180608;border:1px solid #dc2626;padding:12px;margin:10px;border-radius:8px;direction:ltr;text-align:left;white-space:pre-wrap;font-size:12px;position:fixed;bottom:10px;left:10px;right:10px;z-index:99999;box-shadow:0 0 20px rgba(220,38,38,0.5)';
+    document.body.appendChild(d);
+  }
+  if (d) d.textContent = 'app.js error: ' + ((err && err.stack) || err);
 }
 
 // ---------- boot ----------
 async function boot() {
-  // __TAURI__ injection is async — wait up to ~5s before first IPC call.
-  for (let i = 0; i < 50 && !(window.__TAURI__ && window.__TAURI__.core); i++) {
+  // Wait for Tauri IPC to be ready
+  for (let i = 0; i < 50 && !getInvoke(); i++) {
     await new Promise((r) => setTimeout(r, 100));
   }
+  const inv = getInvoke();
+  console.log('[boot] IPC connection:', inv ? 'READY' : 'UNAVAILABLE');
+
   let s = {};
-  try { s = await call('get_settings'); } catch (e) { /* defaults */ }
+  try { s = await call('get_settings'); } catch (e) { console.warn('[boot] get_settings failed:', e); }
   state.lang = s.lang || 'fa';
   state.unlocked = !!s.unlocked;
   state.lastPath = s.last_path || null;
-  const sw = document.getElementById('sw-unit-status');
-  if (sw) sw.checked = !!s.unit_status_new;
+  state.unitStatusNew = !!s.unit_status_new;
+  state.reflexMode = s.reflex_mode ?? 1;
+  state.fpsMax = s.fps_max ?? 0;
+  state.vsync = !!s.vsync;
+  state.reduceFlash = s.reduce_flash !== false;
+  state.textureBias = s.texture_bias ?? 0;
+  state.ragdollGibLimit = s.ragdoll_gib_limit !== false;
+  state.customAutoexec = s.custom_autoexec || '';
+
   applyLang();
+  syncSettingsToUi();
   setFov(90);
-  selectCardByKey('display');
+  selectCardByKey('graphic');
 
   if (state.unlocked) showTesterModes();
 
@@ -88,6 +128,33 @@ async function boot() {
   } catch (e) { /* non-fatal */ }
 
   await refreshGame();
+}
+
+function syncSettingsToUi() {
+  const swUnit = document.getElementById('sw-unit-status');
+  if (swUnit) swUnit.checked = !!state.unitStatusNew;
+
+  const swVsync = document.getElementById('sw-vsync');
+  if (swVsync) swVsync.checked = !!state.vsync;
+
+  const swFlash = document.getElementById('sw-reduce-flash');
+  if (swFlash) swFlash.checked = !!state.reduceFlash;
+
+  const swRagdoll = document.getElementById('sw-ragdoll-limit');
+  if (swRagdoll) swRagdoll.checked = !!state.ragdollGibLimit;
+
+  const selBias = document.getElementById('sel-texture-bias');
+  if (selBias) selBias.value = String(state.textureBias);
+
+  const inpFps = document.getElementById('inp-fps-max');
+  if (inpFps) inpFps.value = state.fpsMax;
+  document.querySelectorAll('#chips-fps .chip-btn').forEach((btn) => {
+    btn.classList.toggle('active', Number(btn.dataset.val) === state.fpsMax);
+  });
+
+  document.querySelectorAll('#seg-reflex .seg-btn').forEach((btn) => {
+    btn.classList.toggle('active', Number(btn.dataset.val) === state.reflexMode);
+  });
 }
 
 async function refreshGame() {
@@ -128,13 +195,19 @@ async function refreshRunning() {
 // ---------- locate game ----------
 async function pickFolder() {
   try {
+    let dir = null;
     const dlg = window.__TAURI__ && window.__TAURI__.dialog;
     if (dlg && dlg.open) {
-      const dir = await dlg.open({ directory: true, title: t('locate') });
-      if (dir) document.getElementById('path-input').value = Array.isArray(dir) ? dir[0] : dir;
+      dir = await dlg.open({ directory: true, title: t('locate') });
+    } else {
+      dir = await call('plugin:dialog|open', { options: { directory: true, title: t('locate') } });
     }
-    // plugin absent: manual paste still works
-  } catch (e) { /* non-fatal */ }
+    if (dir) {
+      document.getElementById('path-input').value = Array.isArray(dir) ? dir[0] : dir;
+    }
+  } catch (e) {
+    console.warn('[pickFolder failed]', e);
+  }
 }
 
 async function confirmPath() {
@@ -278,6 +351,40 @@ async function renderBackups() {
   }
 }
 
+// ---------- revert vanilla ----------
+async function doRevertVanilla() {
+  if (!state.gamePath) {
+    showModal(t('revertVanilla'), t('noGame'), [{ label: 'OK' }]);
+    return;
+  }
+  const confirm = await showModal(t('revertVanilla'), t('confirmRevertVanilla'), [
+    { label: t('btnRevertVanilla'), value: true, kind: 'apply' },
+    { label: t('guardCancel'), value: false },
+  ]);
+  if (!confirm) return;
+
+  const btn = document.getElementById('btn-revert-vanilla');
+  if (btn) btn.disabled = true;
+  document.getElementById('step-log').innerHTML = '';
+  stepLine(t('working'));
+  try {
+    const rep = await call('revert_original_cmd', { path: state.gamePath });
+    let details = [];
+    if (rep.restored_gi) details.push('gameinfo.gi');
+    if (rep.restored_video) details.push('cfg\\video.txt');
+    if (rep.removed_addons && rep.removed_addons.length > 0) {
+      details.push(`${rep.removed_addons.length} addons removed`);
+    }
+    stepLine(`[revert] ${details.join(', ') || 'restored'}`, 'ok');
+    updateDetectBadge();
+    showModal(t('revertVanilla'), t('revertComplete'), [{ label: 'OK', kind: 'apply' }]);
+  } catch (e) {
+    stepLine(String(e), 'skip');
+    showModal(t('revertVanilla'), String(e), [{ label: 'OK' }]);
+  }
+  if (btn) btn.disabled = false;
+}
+
 // ---------- tester unlock ----------
 function showTesterModes() {
   const l = document.getElementById('tester-locked');
@@ -329,45 +436,250 @@ function setFov(v) {
   const number = document.getElementById('fov-number');
   const snapped = Math.min(120, Math.max(70, Math.round((v - 70) / 5) * 5 + 70));
   state.fov = snapped;
-  slider.value = snapped;
-  number.value = snapped;
-  document.getElementById('ar-preview').textContent = AR_TABLE[snapped] || '2.15';
-  document.getElementById('fov-summary').textContent = `FOV ${snapped} · AR ${AR_TABLE[snapped] || '2.15'}`;
+  if (slider) slider.value = snapped;
+  if (number) number.value = snapped;
+  const arPrev = document.getElementById('ar-preview');
+  if (arPrev) arPrev.textContent = AR_TABLE[snapped] || '2.15';
+  const fovSum = document.getElementById('fov-summary');
+  if (fovSum) fovSum.textContent = `FOV ${snapped} · AR ${AR_TABLE[snapped] || '2.15'}`;
+  document.querySelectorAll('#chips-fov .chip-btn').forEach((b) => {
+    b.classList.toggle('active', Number(b.dataset.val) === snapped);
+  });
+}
+
+// ---------- valve game servers ping ----------
+let pingingActive = false;
+
+function renderValvePings(servers) {
+  const grid = document.getElementById('ping-grid');
+  const tag = document.getElementById('best-server-tag');
+  if (!grid || !Array.isArray(servers)) return;
+
+  grid.innerHTML = '';
+  let bestPing = Infinity;
+  let bestServerName = '';
+
+  for (const s of servers) {
+    const hasPing = s.ping_ms !== null && s.ping_ms !== undefined;
+    let qualityClass = 'ping-timeout';
+    let msText = '-- ' + t('pingMs');
+
+    if (hasPing) {
+      const ms = s.ping_ms;
+      msText = `${ms} ${t('pingMs')}`;
+      if (ms < 80) qualityClass = 'ping-great';
+      else if (ms < 130) qualityClass = 'ping-good';
+      else if (ms < 180) qualityClass = 'ping-fair';
+      else qualityClass = 'ping-high';
+
+      if (ms < bestPing) {
+        bestPing = ms;
+        bestServerName = state.lang === 'fa' ? s.name_fa : (s.name || s.name_en);
+      }
+    }
+
+    const card = document.createElement('div');
+    card.className = `ping-card ${hasPing && s.ping_ms === bestPing ? 'is-best' : ''}`;
+
+    const name = state.lang === 'fa' ? s.name_fa : (s.name || s.name_en);
+    card.innerHTML = `
+      <div class="ping-card-top">
+        <div class="ping-card-title">${name}</div>
+        <span class="ping-code-badge">${s.id.toUpperCase()}</span>
+      </div>
+      <div class="ping-card-bottom">
+        <span class="ping-ip" dir="ltr">${s.ip}</span>
+        <div class="ping-ms-pill ${qualityClass}">
+          <span class="ping-dot"></span>
+          <span class="ping-val">${msText}</span>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  }
+
+  if (tag) {
+    if (bestPing < Infinity) {
+      tag.textContent = `${t('bestServer')}${bestServerName} (${bestPing}ms)`;
+      tag.style.display = 'inline-flex';
+    } else {
+      tag.style.display = 'none';
+    }
+  }
+}
+
+async function refreshValvePings() {
+  if (pingingActive) return;
+  pingingActive = true;
+  const btn = document.getElementById('btn-refresh-ping');
+  const grid = document.getElementById('ping-grid');
+  if (btn) btn.disabled = true;
+
+  if (grid && (!state.lastValvePings || state.lastValvePings.length === 0)) {
+    grid.innerHTML = `<div class="ping-loading-msg"><div class="ping-spinner"></div><span>${t('pingTesting')}</span></div>`;
+  }
+
+  try {
+    const servers = await call('ping_valve_servers');
+    state.lastValvePings = servers;
+    renderValvePings(servers);
+  } catch (err) {
+    console.error('[ping_valve_servers error]', err);
+    if (grid && (!state.lastValvePings || state.lastValvePings.length === 0)) {
+      grid.innerHTML = `<div class="ping-loading-msg text-danger">${String(err)}</div>`;
+    }
+  } finally {
+    if (btn) btn.disabled = false;
+    pingingActive = false;
+  }
 }
 
 // ---------- tab switcher (CSP-safe: no inline onclick) ----------
 const SECTION_TITLES = {
-  display: 'presetsTitle',
-  engine: 'cardEngine',
+  graphic: 'presetsTitle',
   latency: 'cardLatency',
-  fov: 'fovTitle',
-  advanced: 'advTitle',
+  advanced: 'cardAdvanced',
 };
-const PANELS = ['display', 'engine', 'latency', 'fov', 'advanced'];
+const PANELS = ['graphic', 'latency', 'advanced'];
 
 function selectCardByKey(tabKey) {
   const el = document.getElementById(`card-${tabKey}`);
   if (!el) return;
-  document.querySelectorAll('.sci-card').forEach((card) => card.classList.remove('active'));
+  document.querySelectorAll('.pro-card, .sci-card').forEach((card) => card.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('section-title').textContent = t(SECTION_TITLES[tabKey] || 'presetsTitle');
   for (const p of PANELS) {
-    document.getElementById(`panel-${p}`).style.display = p === tabKey ? 'block' : 'none';
+    const pan = document.getElementById(`panel-${p}`);
+    if (pan) pan.style.display = p === tabKey ? 'block' : 'none';
   }
+  if (tabKey === 'latency') refreshValvePings();
   if (tabKey === 'advanced') renderBackups();
 }
 
-// ---------- wire everything ----------
-window.addEventListener('DOMContentLoaded', () => {
+function getWin() {
   try {
+    if (window.__TAURI__) {
+      if (window.__TAURI__.webviewWindow && typeof window.__TAURI__.webviewWindow.getCurrentWebviewWindow === 'function') {
+        return window.__TAURI__.webviewWindow.getCurrentWebviewWindow();
+      }
+      if (window.__TAURI__.window && typeof window.__TAURI__.window.getCurrentWindow === 'function') {
+        return window.__TAURI__.window.getCurrentWindow();
+      }
+    }
+  } catch (e) {}
+  return null;
+}
+
+async function handleWinMin() {
+  const w = getWin();
+  if (w && typeof w.minimize === 'function') {
+    try { await w.minimize(); return; } catch (e) {}
+  }
+  call('plugin:window|minimize', { label: 'main' }).catch(() => {});
+}
+
+async function handleWinMax() {
+  const w = getWin();
+  if (w && typeof w.isMaximized === 'function') {
+    try {
+      const maxed = await w.isMaximized();
+      if (maxed) await w.unmaximize();
+      else await w.maximize();
+      setTimeout(updateScale, 50);
+      setTimeout(updateScale, 200);
+      return;
+    } catch (e) {}
+  }
+  call('plugin:window|toggle_maximize', { label: 'main' }).catch(() => {});
+  setTimeout(updateScale, 50);
+  setTimeout(updateScale, 200);
+}
+
+async function handleWinClose() {
+  const w = getWin();
+  if (w && typeof w.close === 'function') {
+    try { await w.close(); return; } catch (e) {}
+  }
+  call('plugin:window|close', { label: 'main' }).catch(() => {});
+}
+
+function setupTitlebarDrag() {
+  const titlebar = document.querySelector('.app-titlebar');
+  if (!titlebar) return;
+  titlebar.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) return;
+    if (e.target.closest('button, input, select, textarea, [data-tauri-drag-region="false"]')) return;
+    const w = getWin();
+    if (w && typeof w.startDragging === 'function') {
+      w.startDragging().catch(() => {});
+    } else {
+      call('plugin:window|start_dragging', { label: 'main' }).catch(() => {});
+    }
+  });
+  titlebar.addEventListener('dblclick', (e) => {
+    if (e.target.closest('button, input, select, textarea, [data-tauri-drag-region="false"]')) return;
+    handleWinMax();
+  });
+}
+
+function updateScale() {
+  const wrapper = document.getElementById('ui-scale-wrapper');
+  if (!wrapper) return;
+  const availW = window.innerWidth;
+  const availH = window.innerHeight - 40; // titlebar is 40px
+  const baseW = 920;
+  const baseH = 540;
+  // If window is at least base dimensions, keep native 1:1 scale (zero transform = 100% razor sharp native DirectWrite pixel grid)
+  if (availW >= baseW && availH >= baseH) {
+    wrapper.style.transform = 'none';
+    return;
+  }
+  // Only downscale if the user resized the window smaller than base design dimensions
+  const scale = Math.min(1, Math.min(availW / baseW, availH / baseH));
+  wrapper.style.transform = `scale(${scale.toFixed(4)})`;
+}
+
+function selectPreset(mode) {
+  state.selectedMode = mode;
+  document.querySelectorAll('.tier-card, .tier-card-sm, .option-item.preset').forEach((p) => {
+    p.classList.toggle('selected', p.dataset.mode === mode);
+  });
+}
+
+window.updateScale = updateScale;
+window.selectPreset = selectPreset;
+window.handleWinMin = handleWinMin;
+window.handleWinMax = handleWinMax;
+window.handleWinClose = handleWinClose;
+window.toggleLang = () => setLang(state.lang === 'fa' ? 'en' : 'fa');
+window.selectCardByKey = selectCardByKey;
+window.refreshValvePings = refreshValvePings;
+window.launchGame = launchGame;
+window.pickFolder = pickFolder;
+window.confirmPath = confirmPath;
+window.doInstall = doInstall;
+window.doBackupNow = doBackupNow;
+window.doRevertVanilla = doRevertVanilla;
+window.doUnlock = doUnlock;
+window.setFov = setFov;
+
+// ---------- wire everything ----------
+function init() {
+  try {
+    updateScale();
+    window.addEventListener('resize', updateScale);
     // window controls
-    const getWin = () => window.__TAURI__ && window.__TAURI__.window.getCurrentWindow();
-    document.getElementById('btn-min').onclick = () => { const w = getWin(); if (w) w.minimize(); };
-    document.getElementById('btn-max').onclick = () => {
-      const w = getWin(); if (!w) return;
-      w.isMaximized().then((m) => (m ? w.unmaximize() : w.maximize())).catch(() => {});
-    };
-    document.getElementById('btn-close').onclick = () => { const w = getWin(); if (w) w.close(); };
+    const btnMin = document.getElementById('btn-min');
+    if (btnMin) btnMin.onclick = handleWinMin;
+    const btnMax = document.getElementById('btn-max');
+    if (btnMax) btnMax.onclick = handleWinMax;
+    const btnClose = document.getElementById('btn-close');
+    if (btnClose) btnClose.onclick = handleWinClose;
+    setupTitlebarDrag();
+
+    // language switcher
+    const btnLang = document.getElementById('btn-lang-toggle');
+    if (btnLang) btnLang.onclick = window.toggleLang;
 
     // actions
     document.getElementById('btn-pick-folder').onclick = pickFolder;
@@ -375,36 +687,118 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-launch').onclick = launchGame;
     document.getElementById('btn-install').onclick = doInstall;
     document.getElementById('btn-backup').onclick = doBackupNow;
+    document.getElementById('btn-revert-vanilla').onclick = doRevertVanilla;
     document.getElementById('btn-unlock').onclick = doUnlock;
-    document.getElementById('sw-unit-status').onchange = (e) => {
-      call('set_settings', { patch: { unit_status_new: e.target.checked } }).catch(() => {});
-    };
+
+    // options & switches
+    const swUnit = document.getElementById('sw-unit-status');
+    if (swUnit) {
+      swUnit.onchange = (e) => {
+        state.unitStatusNew = e.target.checked;
+        call('set_settings', { patch: { unit_status_new: e.target.checked } }).catch(() => {});
+      };
+    }
+
+    // Engine controls
+    const selBias = document.getElementById('sel-texture-bias');
+    if (selBias) {
+      selBias.onchange = (e) => {
+        state.textureBias = Number(e.target.value);
+        call('set_settings', { patch: { texture_bias: state.textureBias } }).catch(() => {});
+      };
+    }
+    const swRagdoll = document.getElementById('sw-ragdoll-limit');
+    if (swRagdoll) {
+      swRagdoll.onchange = (e) => {
+        state.ragdollGibLimit = e.target.checked;
+        call('set_settings', { patch: { ragdoll_gib_limit: state.ragdollGibLimit } }).catch(() => {});
+      };
+    }
+
+    // Latency controls: Reflex
+    document.querySelectorAll('#seg-reflex .seg-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#seg-reflex .seg-btn').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.reflexMode = Number(btn.dataset.val);
+        call('set_settings', { patch: { reflex_mode: state.reflexMode } }).catch(() => {});
+      });
+    });
+
+    // Latency controls: FPS cap
+    const inpFps = document.getElementById('inp-fps-max');
+    document.querySelectorAll('#chips-fps .chip-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#chips-fps .chip-btn').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        const val = Number(btn.dataset.val);
+        state.fpsMax = val;
+        if (inpFps) inpFps.value = val;
+        call('set_settings', { patch: { fps_max: val } }).catch(() => {});
+      });
+    });
+    if (inpFps) {
+      inpFps.onchange = (e) => {
+        const val = Math.max(0, Number(e.target.value) || 0);
+        state.fpsMax = val;
+        document.querySelectorAll('#chips-fps .chip-btn').forEach((b) => {
+          b.classList.toggle('active', Number(b.dataset.val) === val);
+        });
+        call('set_settings', { patch: { fps_max: val } }).catch(() => {});
+      };
+    }
+
+    const swVsync = document.getElementById('sw-vsync');
+    if (swVsync) {
+      swVsync.onchange = (e) => {
+        state.vsync = e.target.checked;
+        call('set_settings', { patch: { vsync: state.vsync } }).catch(() => {});
+      };
+    }
+
+    const swFlash = document.getElementById('sw-reduce-flash');
+    if (swFlash) {
+      swFlash.onchange = (e) => {
+        state.reduceFlash = e.target.checked;
+        call('set_settings', { patch: { reduce_flash: state.reduceFlash } }).catch(() => {});
+      };
+    }
 
     // FOV controls
     const slider = document.getElementById('fov-slider');
     const number = document.getElementById('fov-number');
-    slider.oninput = () => setFov(Number(slider.value));
-    number.onchange = () => setFov(Number(number.value) || 90);
-    document.getElementById('panel-fov').addEventListener('wheel', (e) => {
-      e.preventDefault();
-      setFov(Number(slider.value) + (e.deltaY < 0 ? 5 : -5));
-    }, { passive: false });
+    if (slider) slider.oninput = () => setFov(Number(slider.value));
+    if (number) number.onchange = () => setFov(Number(number.value) || 90);
+    const pFov = document.getElementById('panel-fov');
+    if (pFov) {
+      pFov.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        setFov(Number(slider ? slider.value : 90) + (e.deltaY < 0 ? 5 : -5));
+      }, { passive: false });
+    }
+    document.querySelectorAll('#chips-fov .chip-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const val = Number(btn.dataset.val);
+        setFov(val);
+      });
+    });
+    const btnFovReset = document.getElementById('btn-fov-reset');
+    if (btnFovReset) {
+      btnFovReset.onclick = () => setFov(90);
+    }
 
     // preset cards (single select, includes TEMP modes when visible)
-    document.querySelectorAll('.option-item.preset').forEach((el) => {
+    document.querySelectorAll('.tier-card, .tier-card-sm, .option-item.preset').forEach((el) => {
       el.addEventListener('click', () => {
-        document.querySelectorAll('.option-item.preset').forEach((p) => p.classList.remove('selected'));
-        el.classList.add('selected');
-        state.selectedMode = el.dataset.mode;
+        selectPreset(el.dataset.mode);
       });
     });
     // default selection so INSTALL always has a mode
     state.selectedMode = 'T1';
-    const t1 = document.querySelector('.option-item.preset[data-mode="T1"]');
-    if (t1) t1.classList.add('selected');
+    selectPreset('T1');
 
     // tab cards — replace inline onclick with proper listeners
-    document.querySelectorAll('.sci-card[id^="card-"]').forEach((card) => {
+    document.querySelectorAll('.pro-card[id^="card-"], .sci-card[id^="card-"]').forEach((card) => {
       const key = card.id.replace('card-', '');
       card.addEventListener('click', () => selectCardByKey(key));
     });
@@ -413,7 +807,13 @@ window.addEventListener('DOMContentLoaded', () => {
   } catch (err) {
     fatal(err);
   }
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
 
 window.addEventListener('error', (e) => fatal(e.error || e.message));
 window.addEventListener('unhandledrejection', (e) => fatal(e.reason));

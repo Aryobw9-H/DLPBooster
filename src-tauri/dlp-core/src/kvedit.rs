@@ -113,6 +113,11 @@ pub fn set_fov(gi_content: &str, ar: &str) -> String {
 /// Managed autoexec block. File = user's own content untouched, plus one marked
 /// block we own. enabled=false removes the block; user content always preserved.
 pub fn upsert_autoexec(existing: &str, enabled: bool) -> String {
+    upsert_autoexec_custom(existing, enabled, "")
+}
+
+/// Managed autoexec block with optional custom cvars.
+pub fn upsert_autoexec_custom(existing: &str, enabled_unit_status: bool, custom_commands: &str) -> String {
     const BEGIN: &str = "// DLP BEGIN";
     const END: &str = "// DLP END";
     let text = strip_bom(existing);
@@ -131,7 +136,8 @@ pub fn upsert_autoexec(existing: &str, enabled: bool) -> String {
             user_lines.push(line);
         }
     }
-    if !enabled {
+    let has_custom = custom_commands.lines().any(|l| !l.trim().is_empty());
+    if !enabled_unit_status && !has_custom {
         let mut s = user_lines.join("\n");
         if !s.is_empty() && (text.ends_with('\n') || s.contains('\n')) {
             s.push('\n');
@@ -145,10 +151,48 @@ pub fn upsert_autoexec(existing: &str, enabled: bool) -> String {
     }
     s.push_str(BEGIN);
     s.push('\n');
-    s.push_str("\tcitadel_unit_status_use_new \"true\"\n");
+    if enabled_unit_status {
+        s.push_str("\tcitadel_unit_status_use_new \"true\"\n");
+    }
+    for line in custom_commands.lines() {
+        let trimmed = line.trim();
+        if !trimmed.is_empty() {
+            s.push('\t');
+            s.push_str(trimmed);
+            s.push('\n');
+        }
+    }
     s.push_str(END);
     s.push('\n');
     s
+}
+
+/// Patch key-values in a video.txt formatted string.
+/// Matches `"setting.<key>"` or `"<key>"`, replacing value while preserving structure.
+pub fn patch_video_kv(content: &str, patches: &[(&str, &str)]) -> String {
+    let mut out = String::with_capacity(content.len() + 64);
+    for ln in content.lines() {
+        let mut replaced = false;
+        if let Some((k, prefix_end, trailing_start)) = parse_line(ln) {
+            for (pk, pv) in patches {
+                if *pk == k {
+                    out.push_str(&ln[..prefix_end]);
+                    out.push('"');
+                    out.push_str(pv);
+                    out.push('"');
+                    out.push_str(&ln[trailing_start..]);
+                    out.push('\n');
+                    replaced = true;
+                    break;
+                }
+            }
+        }
+        if !replaced {
+            out.push_str(ln);
+            out.push('\n');
+        }
+    }
+    out
 }
 
 #[cfg(test)]
@@ -242,5 +286,23 @@ mod tests {
         assert!(out.starts_with("// my own tweaks\nr_thing \"3\"\n"));
         assert!(out.contains("// DLP BEGIN"));
         assert_eq!(upsert_autoexec(existing, false), existing);
+    }
+
+    #[test]
+    fn autoexec_custom_commands_appended() {
+        let existing = "// base\n";
+        let out = upsert_autoexec_custom(existing, true, "fps_max 165\nsensitivity 1.2");
+        assert!(out.contains("citadel_unit_status_use_new \"true\""));
+        assert!(out.contains("\tfps_max 165\n"));
+        assert!(out.contains("\tsensitivity 1.2\n"));
+    }
+
+    #[test]
+    fn patch_video_kv_replaces_keys() {
+        let video = "\"setting.r_low_latency\" \"0\"\n\"setting.fps_max\" \"0\"\n\"setting.mat_vsync\" \"0\"\n";
+        let patched = patch_video_kv(video, &[("setting.r_low_latency", "1"), ("setting.fps_max", "144")]);
+        assert!(patched.contains("\"setting.r_low_latency\" \"1\""));
+        assert!(patched.contains("\"setting.fps_max\" \"144\""));
+        assert!(patched.contains("\"setting.mat_vsync\" \"0\""));
     }
 }

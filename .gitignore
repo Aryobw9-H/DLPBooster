@@ -26,3 +26,6 @@ dist-ssr
 # payload stays private, built from D:\Claude\ddlock at build time
 src-tauri/payload.zip
 src-tauri/gen/schemas/
+
+# build scripts / generated
+src-tauri/nsis_hooks.nsh

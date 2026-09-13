@@ -13,6 +13,7 @@ use std::path::Path;
 #[derive(Debug, Default, Clone, serde::Serialize)]
 pub struct AddonReport {
     pub added: Vec<String>,
+    pub removed: Vec<String>,
     pub skipped: Vec<String>,
     pub renumbered: Vec<(String, String)>, // (src name, installed as)
     pub kept_user: Vec<String>,
@@ -38,6 +39,46 @@ pub fn install_addons(src: &Path, dst: &Path, only: &str, exclude: &str) -> std:
     let only_list = split_list(only);
     let excl_list = split_list(exclude);
 
+    let mut rep = AddonReport::default();
+
+    // 1) Automatically remove excluded addons if they match our package files
+    // (e.g. switching from Potato to T1/T2/T3 cleans up pak01..pak03 potato mods)
+    for fname in &excl_list {
+        let target = dst.join(fname);
+        if target.exists() {
+            let src_file = src.join(fname);
+            let is_ours = if let (Ok(s_meta), Ok(d_meta)) = (src_file.metadata(), target.metadata()) {
+                s_meta.len() == d_meta.len()
+            } else {
+                false
+            };
+            if is_ours {
+                let _ = std::fs::remove_file(&target);
+                rep.removed.push(fname.clone());
+            }
+        }
+    }
+
+    // 2) If only_list is restricted (e.g. Potato mode), remove our non-potato addons
+    if !only_list.is_empty() {
+        if let Ok(src_entries) = std::fs::read_dir(src) {
+            for entry in src_entries.flatten() {
+                let fname = entry.file_name().to_string_lossy().into_owned();
+                if fname.ends_with(".vpk") && !only_list.contains(&fname) {
+                    let target = dst.join(&fname);
+                    if target.exists() {
+                        if let (Ok(s_meta), Ok(d_meta)) = (entry.metadata(), target.metadata()) {
+                            if s_meta.len() == d_meta.len() {
+                                let _ = std::fs::remove_file(&target);
+                                rep.removed.push(fname);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     // ceiling: highest pak number in destination OR source
     let mut max_n = 0u32;
     for dir in [dst, src] {
@@ -49,7 +90,6 @@ pub fn install_addons(src: &Path, dst: &Path, only: &str, exclude: &str) -> std:
         }
     }
 
-    let mut rep = AddonReport::default();
     let man = dst.parent().unwrap_or(dst).join("addons_manifest.txt");
     let mut installed: Vec<String> = Vec::new();
 
@@ -191,5 +231,28 @@ mod tests {
         let rep = install_addons(&src, &dst, "", "").unwrap();
         assert_eq!(rep.kept_user, vec!["custom.vpk".to_string()]);
         assert_eq!(std::fs::metadata(dst.join("custom.vpk")).unwrap().len(), 20);
+    }
+
+    #[test]
+    fn potato_to_tier2_removes_potato_addons() {
+        let (src, dst) = setup("potato_switch");
+        touch(&src.join("pak01_dir.vpk"), 100);
+        touch(&src.join("pak02_dir.vpk"), 100);
+        touch(&src.join("pak04_dir.vpk"), 200);
+
+        // 1. Install Potato mode (only pak01, pak02)
+        let rep_pot = install_addons(&src, &dst, "pak01_dir.vpk,pak02_dir.vpk", "").unwrap();
+        assert!(dst.join("pak01_dir.vpk").exists());
+        assert!(dst.join("pak02_dir.vpk").exists());
+        assert!(!dst.join("pak04_dir.vpk").exists());
+        assert_eq!(rep_pot.added.len(), 2);
+
+        // 2. Switch to Tier 2 (excludes pak01, pak02; installs pak04)
+        let rep_t2 = install_addons(&src, &dst, "", "pak01_dir.vpk,pak02_dir.vpk").unwrap();
+        assert!(!dst.join("pak01_dir.vpk").exists());
+        assert!(!dst.join("pak02_dir.vpk").exists());
+        assert!(dst.join("pak04_dir.vpk").exists());
+        assert_eq!(rep_t2.removed, vec!["pak01_dir.vpk", "pak02_dir.vpk"]);
+        assert_eq!(rep_t2.added, vec!["pak04_dir.vpk"]);
     }
 }

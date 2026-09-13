@@ -115,6 +115,18 @@ pub fn do_restore(name: String, path: String) -> Result<RestoreReportDto, String
     })
 }
 
+#[tauri::command]
+pub fn revert_original_cmd(path: String) -> Result<RestoreReportDto, String> {
+    let deadlock = resolve_path(&path)?;
+    let cit = std::path::Path::new(&deadlock).join("game").join("citadel");
+    backup::revert_original(&cit).map(|r| RestoreReportDto {
+        restored_gi: r.restored_gi,
+        restored_video: r.restored_video,
+        removed_addons: r.removed_addons,
+        restored_addons: r.restored_addons,
+    })
+}
+
 // ---------- settings ----------
 #[derive(Serialize)]
 pub struct SettingsDto {
@@ -122,11 +134,30 @@ pub struct SettingsDto {
     pub unlocked: bool,
     pub last_path: Option<String>,
     pub unit_status_new: bool,
+    pub reflex_mode: u8,
+    pub fps_max: u32,
+    pub vsync: bool,
+    pub reduce_flash: bool,
+    pub texture_bias: u8,
+    pub ragdoll_gib_limit: bool,
+    pub custom_autoexec: String,
 }
 
 impl From<settings::Settings> for SettingsDto {
     fn from(s: settings::Settings) -> Self {
-        SettingsDto { lang: s.lang, unlocked: s.unlocked, last_path: s.last_path, unit_status_new: s.unit_status_new }
+        SettingsDto {
+            lang: s.lang,
+            unlocked: s.unlocked,
+            last_path: s.last_path,
+            unit_status_new: s.unit_status_new,
+            reflex_mode: s.reflex_mode,
+            fps_max: s.fps_max,
+            vsync: s.vsync,
+            reduce_flash: s.reduce_flash,
+            texture_bias: s.texture_bias,
+            ragdoll_gib_limit: s.ragdoll_gib_limit,
+            custom_autoexec: s.custom_autoexec,
+        }
     }
 }
 
@@ -136,6 +167,13 @@ pub struct SettingsPatch {
     pub unlock_code: Option<String>,
     pub last_path: Option<String>,
     pub unit_status_new: Option<bool>,
+    pub reflex_mode: Option<u8>,
+    pub fps_max: Option<u32>,
+    pub vsync: Option<bool>,
+    pub reduce_flash: Option<bool>,
+    pub texture_bias: Option<u8>,
+    pub ragdoll_gib_limit: Option<bool>,
+    pub custom_autoexec: Option<String>,
 }
 
 /// Tester unlock code. Placeholder until Aryo supplies the real code.
@@ -167,6 +205,27 @@ pub fn set_settings(patch: SettingsPatch) -> Result<SettingsDto, String> {
     if let Some(u) = patch.unit_status_new {
         s.unit_status_new = u;
     }
+    if let Some(rm) = patch.reflex_mode {
+        s.reflex_mode = rm;
+    }
+    if let Some(fm) = patch.fps_max {
+        s.fps_max = fm;
+    }
+    if let Some(vs) = patch.vsync {
+        s.vsync = vs;
+    }
+    if let Some(rf) = patch.reduce_flash {
+        s.reduce_flash = rf;
+    }
+    if let Some(tb) = patch.texture_bias {
+        s.texture_bias = tb;
+    }
+    if let Some(rg) = patch.ragdoll_gib_limit {
+        s.ragdoll_gib_limit = rg;
+    }
+    if let Some(ca) = patch.custom_autoexec {
+        s.custom_autoexec = ca;
+    }
     settings::save(&s).map_err(|e| e.to_string())?;
     Ok(s.into())
 }
@@ -186,4 +245,175 @@ pub fn running_from_pkg() -> bool {
         }
     }
     false
+}
+
+// ---------- valve ping ----------
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ServerPing {
+    pub id: String,
+    pub name: String,
+    pub name_fa: String,
+    pub region: String,
+    pub region_fa: String,
+    pub ip: String,
+    pub ping_ms: Option<u32>,
+}
+
+#[derive(Clone)]
+struct ValveServerDef {
+    id: &'static str,
+    name: &'static str,
+    name_fa: &'static str,
+    region: &'static str,
+    region_fa: &'static str,
+    ip: &'static str,
+}
+
+const VALVE_SERVERS: &[ValveServerDef] = &[
+    ValveServerDef {
+        id: "fra",
+        name: "Frankfurt",
+        name_fa: "فرانکفورت (آلمان)",
+        region: "Europe West",
+        region_fa: "غرب اروپا",
+        ip: "155.133.226.68",
+    },
+    ValveServerDef {
+        id: "vie",
+        name: "Vienna",
+        name_fa: "وین (اتریش)",
+        region: "Europe East",
+        region_fa: "شرق اروپا",
+        ip: "146.66.155.66",
+    },
+    ValveServerDef {
+        id: "dxb",
+        name: "Dubai",
+        name_fa: "دبی (امارات)",
+        region: "Middle East",
+        region_fa: "خاورمیانه",
+        ip: "185.25.183.163",
+    },
+    ValveServerDef {
+        id: "sto",
+        name: "Stockholm",
+        name_fa: "استکهلم (سوئد)",
+        region: "Europe North",
+        region_fa: "شمال اروپا",
+        ip: "162.254.198.41",
+    },
+    ValveServerDef {
+        id: "waw",
+        name: "Warsaw",
+        name_fa: "ورشو (لهستان)",
+        region: "Europe Central",
+        region_fa: "مرکز اروپا",
+        ip: "155.133.230.98",
+    },
+    ValveServerDef {
+        id: "ams",
+        name: "Amsterdam",
+        name_fa: "آمستردام (هلند)",
+        region: "Europe West",
+        region_fa: "غرب اروپا",
+        ip: "155.133.248.36",
+    },
+    ValveServerDef {
+        id: "lhr",
+        name: "London",
+        name_fa: "لندن (انگلیس)",
+        region: "Europe West",
+        region_fa: "غرب اروپا",
+        ip: "162.254.197.37",
+    },
+    ValveServerDef {
+        id: "iad",
+        name: "US East",
+        name_fa: "شرق آمریکا (ویرجینیا)",
+        region: "North America",
+        region_fa: "آمریکای شمالی",
+        ip: "162.254.192.67",
+    },
+];
+
+fn ping_single_ip(ip: &str, timeout_ms: u32) -> Option<u32> {
+    use std::process::Command;
+    #[cfg(windows)]
+    use std::os::windows::process::CommandExt;
+
+    let mut cmd = Command::new("ping");
+    cmd.args(["-n", "1", "-w", &timeout_ms.to_string(), ip]);
+
+    #[cfg(windows)]
+    cmd.creation_flags(0x0800_0000); // CREATE_NO_WINDOW: prevent CMD window flash
+
+    let output = cmd.output().ok()?;
+    let text = String::from_utf8_lossy(&output.stdout);
+
+    if text.contains("time<1ms") || text.contains("time<") {
+        return Some(1);
+    }
+    if let Some(pos) = text.find("time=") {
+        let rest = &text[pos + 5..];
+        let num_str: String = rest.chars().take_while(|c| c.is_ascii_digit()).collect();
+        if let Ok(ms) = num_str.parse::<u32>() {
+            return Some(ms);
+        }
+    }
+    if let Some(pos) = text.find("Average = ") {
+        let rest = &text[pos + 10..];
+        let num_str: String = rest.chars().take_while(|c| c.is_ascii_digit()).collect();
+        if let Ok(ms) = num_str.parse::<u32>() {
+            return Some(ms);
+        }
+    }
+    for word in text.split_whitespace() {
+        if let Some(stripped) = word.strip_suffix("ms") {
+            let digits: String = stripped.chars().filter(|c| c.is_ascii_digit()).collect();
+            if let Ok(ms) = digits.parse::<u32>() {
+                if ms > 0 && ms < 2000 {
+                    return Some(ms);
+                }
+            }
+        }
+    }
+    None
+}
+
+#[tauri::command]
+pub async fn ping_valve_servers() -> Result<Vec<ServerPing>, String> {
+    use std::sync::mpsc;
+    use std::thread;
+
+    let (tx, rx) = mpsc::channel();
+    let mut handles = vec![];
+
+    for s in VALVE_SERVERS {
+        let tx = tx.clone();
+        let s = s.clone();
+        handles.push(thread::spawn(move || {
+            let ping = ping_single_ip(s.ip, 1800);
+            let _ = tx.send(ServerPing {
+                id: s.id.to_string(),
+                name: s.name.to_string(),
+                name_fa: s.name_fa.to_string(),
+                region: s.region.to_string(),
+                region_fa: s.region_fa.to_string(),
+                ip: s.ip.to_string(),
+                ping_ms: ping,
+            });
+        }));
+    }
+    drop(tx);
+
+    let mut results = vec![];
+    for ping_res in rx {
+        results.push(ping_res);
+    }
+    for h in handles {
+        let _ = h.join();
+    }
+
+    results.sort_by_key(|r| r.ping_ms.unwrap_or(9999));
+    Ok(results)
 }

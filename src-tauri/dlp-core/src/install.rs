@@ -7,7 +7,6 @@ use std::path::Path;
 use crate::addons;
 use crate::backup::set_readonly;
 use crate::kvedit;
-use crate::payload;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Mode {
@@ -119,6 +118,17 @@ pub fn install(mode: Mode, fov: u32, deadlock: &str, pkg: &Path, data_dir: &Path
     // 3) .dlp.bak snapshots (permanent restore points, never deleted)
     log.extend(snapshot_original(&citadel)?);
 
+    // Initial backup into %APPDATA% if none exists yet
+    if crate::backup::list_backups(data_dir).is_empty() {
+        if let Ok(b_name) = crate::backup::do_backup(&citadel, data_dir) {
+            log.push(StepLog {
+                step: "backup".into(),
+                detail: format!("initial full backup saved ({b_name})"),
+                skipped: false,
+            });
+        }
+    }
+
     // 4) tier gameinfo.gi with per-user FOV swapped in
     let ar = crate::fov::aspect_ratio(fov);
     let src_gi = pkg.join(mode.tier_dir()).join("gameinfo.gi");
@@ -140,10 +150,10 @@ pub fn install(mode: Mode, fov: u32, deadlock: &str, pkg: &Path, data_dir: &Path
     log.push(StepLog {
         step: "addons".into(),
         detail: format!(
-            "{} added, {} identical, {} renumbered, {} user-kept",
-            rep.added.len(), rep.skipped.len(), rep.renumbered.len(), rep.kept_user.len()
+            "{} added, {} removed, {} identical, {} renumbered, {} user-kept",
+            rep.added.len(), rep.removed.len(), rep.skipped.len(), rep.renumbered.len(), rep.kept_user.len()
         ),
-        skipped: rep.added.is_empty() && rep.renumbered.is_empty(),
+        skipped: rep.added.is_empty() && rep.removed.is_empty() && rep.renumbered.is_empty(),
     });
 
     // 6) video merge with read-only dance
@@ -155,22 +165,46 @@ pub fn install(mode: Mode, fov: u32, deadlock: &str, pkg: &Path, data_dir: &Path
     let user_v = std::fs::read_to_string(&vd).map_err(|e| e.to_string())?;
     let tpl_v = std::fs::read_to_string(pkg.join(mode.video_dir()).join("video.txt")).map_err(|e| e.to_string())?;
     let merged = kvedit::merge_video(&user_v, &tpl_v);
-    std::fs::write(&vd, &merged).map_err(|e| e.to_string())?;
+
+    let s = crate::settings::load();
+    let mut patches: Vec<(&str, String)> = Vec::new();
+    if s.reflex_mode > 0 {
+        patches.push(("setting.r_low_latency", s.reflex_mode.to_string()));
+    }
+    if s.fps_max > 0 {
+        patches.push(("setting.fps_max", s.fps_max.to_string()));
+    }
+    if s.vsync {
+        patches.push(("setting.mat_vsync", "1".to_string()));
+    }
+    if s.reduce_flash {
+        patches.push(("setting.r_reduce_flash", "1".to_string()));
+    }
+    if s.texture_bias > 0 {
+        patches.push(("setting.r_texture_stream_mip_bias", s.texture_bias.to_string()));
+    }
+    let patch_refs: Vec<(&str, &str)> = patches.iter().map(|(k, v)| (*k, v.as_str())).collect();
+    let final_video = kvedit::patch_video_kv(&merged, &patch_refs);
+
+    std::fs::write(&vd, &final_video).map_err(|e| e.to_string())?;
     set_readonly(&vd, true).map_err(|e| e.to_string())?;
     log.push(StepLog { step: "video.txt".into(), detail: "patched + write-protected (backup: video.txt.dlp.bak)".into(), skipped: false });
 
     // 7) autoexec managed block per settings flag
-    let s = crate::settings::load();
     let cfg_dir = citadel.join("cfg");
     std::fs::create_dir_all(&cfg_dir).map_err(|e| e.to_string())?;
     let ae = cfg_dir.join("autoexec.cfg");
     let existing = std::fs::read_to_string(&ae).unwrap_or_default();
-    let new_ae = kvedit::upsert_autoexec(&existing, s.unit_status_new);
+    let new_ae = kvedit::upsert_autoexec_custom(&existing, s.unit_status_new, &s.custom_autoexec);
     if new_ae != existing {
         std::fs::write(&ae, new_ae).map_err(|e| e.to_string())?;
         log.push(StepLog {
             step: "autoexec.cfg".into(),
-            detail: if s.unit_status_new { "managed block written (new unit status UI)".into() } else { "managed block removed".into() },
+            detail: if s.unit_status_new || !s.custom_autoexec.trim().is_empty() {
+                "managed block written".into()
+            } else {
+                "managed block removed".into()
+            },
             skipped: false,
         });
     }
