@@ -82,7 +82,7 @@ window.I18N_FA = {
   confirmRevertVanilla: "آیا مطمئن هستید؟ تمام تغییرات بوستر و مودها پاک شده و فایل‌های پیش‌فرض بازی بازگردانده می‌شوند.",
   revertComplete: "تمام تغییرات با موفقیت بازگردانده شدند.",
   // Valve Ping
-  valvePingTitle: "پینگ سرورهای بازی ددلاک (Valve)",
+  valvePingTitle: "DEADLOCK RELAY NETWORK",
   btnRefreshPing: "بروزرسانی پینگ",
   pingTesting: "در حال سنجش پینگ...",
   bestServer: "بهترین سرور برای شما: ",

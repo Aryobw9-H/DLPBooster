@@ -490,7 +490,7 @@ function stateDot(state) {
 // inline sparkline: SVG polyline of real samples, 0-loss baseline
 function sparkline(samples, state) {
   if (!samples || samples.length < 2) return '<div class="spark-flat"></div>';
-  const w = 220, h = 30, max = Math.max(...samples, 10) * 1.1;
+  const w = 460, h = 34, max = Math.max(...samples, 10) * 1.1;
   const step = w / (samples.length - 1);
   const pts = samples.map((v, i) => `${(i * step).toFixed(1)},${(h - (v / max) * h * 0.9 - 2).toFixed(1)}`).join(' ');
   const cls = state === 'offline' ? 'spark offline' : state === 'unstable' ? 'spark bad' : state === 'stable' ? 'spark mid' : 'spark good';
@@ -627,9 +627,23 @@ const SECTION_TITLES = {
 };
 const PANELS = ['graphic', 'latency', 'advanced'];
 
+const HERO_BY_TAB = {
+  graphic: { en: 'FPS BOOST', fa: 'FPS BOOST', sub_en: 'Custom configuration & FPS boost for Deadlock players', sub_fa: 'پیکربندی اختصاصی و افزایش فریم برای بازیکنان ددلاک' },
+  latency: { en: 'NETWORK', fa: 'NETWORK', sub_en: 'Server latency & connection diagnostics', sub_fa: 'تشخیص تأخیر و کیفیت اتصال' },
+  advanced: { en: 'ADVANCED', fa: 'ADVANCED', sub_en: 'Backup, vanilla restore & game configuration', sub_fa: 'بکاپ، بازگردانی بازی اصلی و پیکربندی' },
+};
+
 function selectCardByKey(tabKey) {
   const el = document.getElementById(`card-${tabKey}`);
   if (!el) return;
+  // contextual hero
+  const hero = HERO_BY_TAB[tabKey];
+  if (hero) {
+    const accent = document.querySelector('.header-subtitle-accent');
+    const sub = document.querySelector('.header-title-fa');
+    if (accent) accent.textContent = hero[state.lang === 'fa' ? 'fa' : 'en'];
+    if (sub) sub.textContent = state.lang === 'fa' ? hero.sub_fa : hero.sub_en;
+  }
   document.querySelectorAll('.pro-card, .sci-card').forEach((card) => card.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('section-title').textContent = t(SECTION_TITLES[tabKey] || 'presetsTitle');

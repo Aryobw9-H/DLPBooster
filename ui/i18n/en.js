@@ -87,7 +87,7 @@ window.I18N_EN = {
   confirmRevertVanilla: "Are you sure? All booster changes and mods will be removed and original files will be restored.",
   revertComplete: "All changes reverted successfully.",
   // Valve Ping
-  valvePingTitle: "Valve Game Servers Ping (Deadlock)",
+  valvePingTitle: "DEADLOCK RELAY NETWORK",
   btnRefreshPing: "Refresh Ping",
   pingTesting: "Measuring latency...",
   bestServer: "Best server for you: ",
