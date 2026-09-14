@@ -2511,13 +2511,10 @@ button:active,
 .setting-col .fov-slider-bar { margin: 0; }
 .setting-col .hud-switch-wrap { margin: 0; justify-content: flex-start; }
 
-/* ===================== COMPACT PANEL — hug content, kill the void ===================== */
+/* ===================== PANEL AREA: classic fixed size, scroll inside ===================== */
 .content-viewport {
-  height: auto !important;
-  min-height: 0 !important;
-  max-height: none !important;
+  overflow: hidden;
 }
-.panel { flex: 1 1 auto; }
 
 
 /* ===================== CAMERA | HUD side-by-side boxes ===================== */
@@ -2541,7 +2538,9 @@ button:active,
 .setting-box .hud-switch-wrap { flex: 1; margin: 0; align-content: center; }
 
 
-/* ===================== NO JUMP: all panels share the same min height ===================== */
+/* ===================== NO JUMP: panels = classic fixed size, scroll inside ===================== */
 #panel-graphic, #panel-latency, #panel-advanced {
-  min-height: 430px;
+  height: 100%;
+  overflow-y: auto;
 }
+.content-viewport { display: flex; flex-direction: column; }
