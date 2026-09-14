@@ -149,4 +149,5 @@ window.I18N_FA = {
   perfBalanced: "BALANCED",
   perfMaxFps: "MAX FPS",
   perfPotato: "POTATO",
+  hudTitle: "HUD",
 };

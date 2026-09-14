@@ -2518,3 +2518,30 @@ button:active,
   max-height: none !important;
 }
 .panel { flex: 1 1 auto; }
+
+
+/* ===================== CAMERA | HUD side-by-side boxes ===================== */
+.settings-duo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  align-items: stretch;
+}
+.setting-box {
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 6px;
+  background: rgba(10, 15, 24, 0.4);
+  padding: 10px 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.setting-box .fov-box-header { margin: 0; }
+.setting-box .fov-slider-bar { margin: 0; flex: 1; }
+.setting-box .hud-switch-wrap { flex: 1; margin: 0; align-content: center; }
+
+
+/* ===================== NO JUMP: all panels share the same min height ===================== */
+#panel-graphic, #panel-latency, #panel-advanced {
+  min-height: 430px;
+}

@@ -168,56 +168,58 @@
               </div>
             </div>
 
-            <!-- Long FOV Box (Full Width) -->
-            <div class="fov-box-wide">
+            <div class="settings-duo">
+            <!-- CAMERA box (FOV) -->
+            <div class="setting-box">
               <div class="fov-box-header">
                 <div class="fov-box-title-wrap">
                   <i class="fa-solid fa-eye" style="font-size:14px"></i>
-                  <span class="fov-box-title" data-i18n="fovTitle">زاویه دید (FOV)</span>
+                  <span class="fov-box-title" data-i18n="fovTitle">FIELD OF VIEW</span>
                 </div>
                 <div class="fov-box-header-actions">
                   <button class="btn-reset btn-sm" id="btn-fov-reset" onclick="setFov(90)">
-                    <span data-i18n="btnFovReset">Reset 90°</span>
+                    <span data-i18n="btnFovReset">Reset 90</span>
                   </button>
                 </div>
               </div>
-
-              <!-- Two functional columns: CAMERA | HUD -->
-              <div class="settings-columns">
-                <div class="setting-col">
-                  <div class="setting-col-title"><i class="fa-solid fa-eye" style="font-size:12px"></i> CAMERA</div>
-                  <div class="fov-slider-bar">
-                    <span class="fov-bound">70°</span>
-                    <input type="range" id="fov-slider" min="70" max="120" step="5" value="90" class="fov-range-input" />
-                    <span class="fov-bound">120°</span>
-                    <input type="number" id="fov-number" min="70" max="120" step="5" value="90" dir="ltr" class="path-input fov-num-input" />
-                  </div>
-                </div>
-                <div class="setting-col">
-                  <div class="setting-col-title"><i class="fa-solid fa-heart-pulse" style="font-size:12px"></i> HUD</div>
-                  <label class="hud-switch-wrap" title="New Health bars">
-                    <span class="hud-switch-label" data-i18n="unitStatus">New Health bars</span>
-                    <label class="neon-checkbox">
-                      <input type="checkbox" id="sw-unit-status">
-                      <div class="neon-checkbox__frame">
-                        <div class="neon-checkbox__box">
-                          <div class="neon-checkbox__check-container">
-                            <svg viewBox="0 0 24 24" class="neon-checkbox__check"><path d="M3,12.5l7,7L21,5" /></svg>
-                          </div>
-                          <div class="neon-checkbox__glow"></div>
-                          <div class="neon-checkbox__borders"><span></span><span></span><span></span><span></span></div>
-                        </div>
-                        <div class="neon-checkbox__effects">
-                          <div class="neon-checkbox__particles"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
-                          <div class="neon-checkbox__rings"><div class="ring"></div><div class="ring"></div><div class="ring"></div></div>
-                          <div class="neon-checkbox__sparks"><span></span><span></span><span></span><span></span></div>
-                        </div>
-                      </div>
-                    </label>
-                  </label>
-                </div>
+              <div class="fov-slider-bar">
+                <span class="fov-bound">70°</span>
+                <input type="range" id="fov-slider" min="70" max="120" step="5" value="90" class="fov-range-input" />
+                <span class="fov-bound">120°</span>
+                <input type="number" id="fov-number" min="70" max="120" step="5" value="90" dir="ltr" class="path-input fov-num-input" />
               </div>
             </div>
+
+            <!-- HUD box (New Health bars) -->
+            <div class="setting-box">
+              <div class="fov-box-header">
+                <div class="fov-box-title-wrap">
+                  <i class="fa-solid fa-heart-pulse" style="font-size:14px"></i>
+                  <span class="fov-box-title" data-i18n="hudTitle">HUD</span>
+                </div>
+              </div>
+              <label class="hud-switch-wrap" title="New Health bars">
+                <span class="hud-switch-label" data-i18n="unitStatus">New Health bars</span>
+                <label class="neon-checkbox">
+                  <input type="checkbox" id="sw-unit-status">
+                  <div class="neon-checkbox__frame">
+                    <div class="neon-checkbox__box">
+                      <div class="neon-checkbox__check-container">
+                        <svg viewBox="0 0 24 24" class="neon-checkbox__check"><path d="M3,12.5l7,7L21,5" /></svg>
+                      </div>
+                      <div class="neon-checkbox__glow"></div>
+                      <div class="neon-checkbox__borders"><span></span><span></span><span></span><span></span></div>
+                    </div>
+                    <div class="neon-checkbox__effects">
+                      <div class="neon-checkbox__particles"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                      <div class="neon-checkbox__rings"><div class="ring"></div><div class="ring"></div><div class="ring"></div></div>
+                      <div class="neon-checkbox__sparks"><span></span><span></span><span></span><span></span></div>
+                    </div>
+                  </div>
+                </label>
+              </label>
+            </div>
+            </div><!-- /settings-duo -->
 
           </div>
         </div>
