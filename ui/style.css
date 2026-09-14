@@ -2544,3 +2544,26 @@ button:active,
   overflow-y: auto;
 }
 .content-viewport { display: flex; flex-direction: column; }
+
+
+/* ===================== PRESET CARDS v3 — name is the hero ===================== */
+.tier-card { padding: 12px 14px; gap: 5px; }
+.tier-perf { order: -1; font-size: 0.55rem; letter-spacing: 2.5px; }
+.tier-name {
+  font-family: 'Orbitron', 'Rajdhani', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.tier-delta { font-size: 0.62rem; }
+.tiers-row { min-height: 96px; }
+
+/* duo boxes demoted: compact secondary row */
+.settings-duo { gap: 8px; margin-top: 8px; }
+.setting-box { padding: 7px 12px 9px; gap: 5px; }
+.setting-box .fov-box-title { font-size: 0.72rem; }
+.setting-box .fov-slider-bar { margin: 0; }
+.fov-range-input { height: 4px; }
+.setting-box .btn-reset { padding: 3px 10px; font-size: 0.62rem; }
+.hud-switch-wrap { gap: 6px; }
+.hud-switch-label { font-size: 0.72rem; }
