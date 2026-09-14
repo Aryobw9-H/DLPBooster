@@ -541,6 +541,15 @@ function relayCardHtml(s, featured) {
   const jitter = s.jitter_ms !== null && s.jitter_ms !== undefined ? `±${s.jitter_ms} ms` : '—';
   const loss = s.loss_pct !== null && s.loss_pct !== undefined ? `${s.loss_pct.toFixed(1)}%` : '—';
   const dot = stateDot(st);
+  const hist = (PING_HISTORY[s.id] || []).map((h) => h.ms);
+  const score = routeScore(s);
+  const sl = scoreLabel(score);
+  const agoSec = lastTestAt ? Math.max(0, Math.round((Date.now() - lastTestAt) / 1000)) : null;
+  const liveTxt = agoSec === null ? t('live') : `${t('live')} · ${agoSec}s`;
+  const hs = hist;
+  const avgV = hs.length ? Math.round(hs.reduce((a, b) => a + b, 0) / hs.length) : null;
+  const minV = hs.length ? Math.min(...hs) : null;
+  const maxV = hs.length ? Math.max(...hs) : null;
 
   if (featured) {
     return `
