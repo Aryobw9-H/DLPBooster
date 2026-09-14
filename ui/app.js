@@ -474,7 +474,9 @@ const HISTORY_WINDOW_MS = 30000;
 function pushHistory(s) {
   const now = Date.now();
   const arr = (PING_HISTORY[s.id] = PING_HISTORY[s.id] || []);
-  if (s.ping_ms !== null && s.ping_ms !== undefined) arr.push({ ms: s.ping_ms, t: now });
+  // one point per test: prefer avg (represents the whole burst)
+  const v = s.avg_ms !== null && s.avg_ms !== undefined ? s.avg_ms : s.ping_ms;
+  if (v !== null && v !== undefined) arr.push({ ms: v, t: now });
   // drop samples older than window
   while (arr.length && now - arr[0].t > HISTORY_WINDOW_MS) arr.shift();
   return arr;
@@ -584,6 +586,7 @@ function renderValvePings(servers) {
   const slot = document.getElementById('best-route-slot');
   if (!grid || !Array.isArray(servers)) return;
 
+  for (const s of servers) pushHistory(s);
   const online = servers.filter((s) => s.ping_ms !== null && s.ping_ms !== undefined);
   // RECOMMENDED = best route score (latency + jitter + loss), not raw ping
   const best = online.length
@@ -594,6 +597,7 @@ function renderValvePings(servers) {
 
   grid.innerHTML = '';
   for (const s of servers) {
+    pushHistory(s);
     if (best && s.id === best.id) continue; // featured separately
     const card = document.createElement('div');
     card.innerHTML = relayCardHtml(s, false);
