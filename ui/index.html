@@ -210,22 +210,29 @@
           </div>
         </div>
 
-        <!-- LATENCY: Valve Servers Live Ping -->
+        <!-- LATENCY: Valve relay network instrument -->
         <div class="panel" id="panel-latency" style="display:none">
           <div class="valve-ping-view" style="flex:1;min-height:0">
             <div class="ping-view-header">
               <div class="ping-header-left">
-                <i class="fa-solid fa-tower-broadcast" style="font-size:16px"></i>
-                <span class="ping-view-title" data-i18n="valvePingTitle">پینگ سرورهای بازی ددلاک (Valve)</span>
+                <span class="net-label">NETWORK</span>
+                <span class="ping-view-title" data-i18n="valvePingTitle">VALVE RELAY LATENCY</span>
               </div>
-              <button class="btn-apply btn-sm" id="btn-refresh-ping" onclick="refreshValvePings()">
-                <i class="fa-solid fa-rotate-right refresh-icon"></i>
-                <span data-i18n="btnRefreshPing">بروزرسانی پینگ</span>
-              </button>
+              <div class="ping-header-right">
+                <span class="last-test" id="last-test-tag" style="display:none"></span>
+                <button class="btn-apply btn-sm" id="btn-refresh-ping" onclick="refreshValvePings()">
+                  <i class="fa-solid fa-rotate-right refresh-icon"></i>
+                  <span data-i18n="btnTestRelays">TEST ALL RELAYS</span>
+                </button>
+              </div>
             </div>
+            <!-- BEST ROUTE: featured card -->
+            <div id="best-route-slot"></div>
+            <div class="relays-label" data-i18n="availableRelays">AVAILABLE RELAYS</div>
             <div class="ping-grid" id="ping-grid">
-              <!-- Dynamically populated server ping cards -->
+              <!-- remaining relays, dynamically populated -->
             </div>
+            <div class="net-footer" id="net-footer" style="display:none"></div>
           </div>
         </div>
 

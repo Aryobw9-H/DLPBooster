@@ -257,6 +257,31 @@ pub struct ServerPing {
     pub region_fa: String,
     pub ip: String,
     pub ping_ms: Option<u32>,
+    // real-sample telemetry (up to 20 ICMP probes per relay)
+    pub samples: Vec<u32>,
+    pub avg_ms: Option<u32>,
+    pub jitter_ms: Option<u32>,     // mean absolute deviation of samples
+    pub loss_pct: f32,              // 0.0 - 100.0
+    pub stability: Option<u8>,      // 0-100 score = 100 - jitter/avg blend
+}
+
+impl ServerPing {
+    fn from_def(s: &ValveServerDef) -> Self {
+        ServerPing {
+            id: s.id.to_string(),
+            name: s.name.to_string(),
+            name_fa: s.name_fa.to_string(),
+            region: s.region.to_string(),
+            region_fa: s.region_fa.to_string(),
+            ip: s.ip.to_string(),
+            ping_ms: None,
+            samples: vec![],
+            avg_ms: None,
+            jitter_ms: None,
+            loss_pct: 100.0,
+            stability: None,
+        }
+    }
 }
 
 #[derive(Clone)]
@@ -388,20 +413,34 @@ pub async fn ping_valve_servers() -> Result<Vec<ServerPing>, String> {
     let (tx, rx) = mpsc::channel();
     let mut handles = vec![];
 
+    const SAMPLES: u32 = 20;
     for s in VALVE_SERVERS {
         let tx = tx.clone();
         let s = s.clone();
         handles.push(thread::spawn(move || {
-            let ping = ping_single_ip(s.ip, 1800);
-            let _ = tx.send(ServerPing {
-                id: s.id.to_string(),
-                name: s.name.to_string(),
-                name_fa: s.name_fa.to_string(),
-                region: s.region.to_string(),
-                region_fa: s.region_fa.to_string(),
-                ip: s.ip.to_string(),
-                ping_ms: ping,
-            });
+            let mut p = ServerPing::from_def(&s);
+            let mut ok: Vec<u32> = vec![];
+            for _ in 0..SAMPLES {
+                if let Some(ms) = ping_single_ip(s.ip, 1200) {
+                    ok.push(ms);
+                }
+                std::thread::sleep(std::time::Duration::from_millis(40));
+            }
+            p.loss_pct = ((SAMPLES - ok.len() as u32) as f32 / SAMPLES as f32) * 100.0;
+            if !ok.is_empty() {
+                let n = ok.len() as f32;
+                let avg = ok.iter().map(|&x| x as f32).sum::<f32>() / n;
+                let mad = ok.iter().map(|&x| (x as f32 - avg).abs()).sum::<f32>() / n;
+                p.avg_ms = Some(avg.round() as u32);
+                p.jitter_ms = Some(mad.round() as u32);
+                p.ping_ms = ok.iter().min().copied(); // best sample = connectable RTT
+                // stability: high when jitter is small relative to latency
+                let jitter_ratio = if avg > 0.0 { mad / avg } else { 1.0 };
+                let score = (100.0 - (jitter_ratio * 140.0) - (p.loss_pct * 0.8)).round().clamp(0.0, 100.0);
+                p.stability = Some(score as u8);
+            }
+            p.samples = ok;
+            let _ = tx.send(p);
         }));
     }
     drop(tx);

@@ -465,52 +465,128 @@ function setFov(v) {
 
 // ---------- valve game servers ping ----------
 let pingingActive = false;
+let lastTestAt = null;
+
+function qualityState(s) {
+  // state machine from REAL telemetry: offline -> unstable -> stable/excellent
+  if (s.ping_ms === null || s.ping_ms === undefined) return 'offline';
+  const ms = s.ping_ms;
+  const jitter = s.jitter_ms || 0;
+  const loss = s.loss_pct || 0;
+  if (loss > 10) return 'unstable';
+  if (ms < 90 && jitter <= 8 && loss < 1) return 'excellent';
+  if (ms < 160 && jitter <= 20) return 'stable';
+  return 'unstable';
+}
+
+function routeLabel(state) {
+  return { excellent: 'routeExcellent', stable: 'routeStable', unstable: 'routeUnstable', poor: 'routePoor', offline: 'offline' }[state] || 'routeStable';
+}
+
+function stateDot(state) {
+  return { excellent: '●', stable: '●', unstable: '◐', offline: '○', poor: '●' }[state] || '●';
+}
+
+// inline sparkline: SVG polyline of real samples, 0-loss baseline
+function sparkline(samples, state) {
+  if (!samples || samples.length < 2) return '<div class="spark-flat"></div>';
+  const w = 220, h = 30, max = Math.max(...samples, 10) * 1.1;
+  const step = w / (samples.length - 1);
+  const pts = samples.map((v, i) => `${(i * step).toFixed(1)},${(h - (v / max) * h * 0.9 - 2).toFixed(1)}`).join(' ');
+  const cls = state === 'offline' ? 'spark offline' : state === 'unstable' ? 'spark bad' : state === 'stable' ? 'spark mid' : 'spark good';
+  return `<svg class="spark-svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><polyline class="${cls}" points="${pts}" fill="none" stroke-width="1.5"/></svg>`;
+}
+
+function relayCardHtml(s, featured) {
+  const st = qualityState(s);
+  const offline = st === 'offline';
+  const name = state.lang === 'fa' ? s.name_fa : (s.name || s.id.toUpperCase());
+  const region = (state.lang === 'fa' ? s.region_fa : s.region || '').toUpperCase();
+  const code = (s.id || '').toUpperCase();
+  const jitter = s.jitter_ms !== null && s.jitter_ms !== undefined ? `±${s.jitter_ms} ms` : '—';
+  const loss = s.loss_pct !== null && s.loss_pct !== undefined ? `${s.loss_pct.toFixed(1)}%` : '—';
+  const dot = stateDot(st);
+
+  if (featured) {
+    return `
+      <div class="featured-card st-${st}">
+        <div class="fc-tag">✦ ${t('recommended')}</div>
+        <div class="fc-head">
+          <div>
+            <div class="fc-name">${name}</div>
+            <div class="fc-region">${region} · ${code}</div>
+          </div>
+          <div class="fc-code">${code}</div>
+        </div>
+        <div class="fc-ping-wrap">
+          <div class="fc-ping">${offline ? '—' : s.ping_ms}</div>
+          <div class="fc-ms">${offline ? '' : 'ms'}</div>
+        </div>
+        ${offline
+          ? `<div class="fc-offline"><span class="fc-offline-x">╳</span> ${t('offline')}</div>`
+          : sparkline(s.samples, st)}
+        <div class="fc-stats">
+          <span class="fc-dot st-text-${st}">${dot} ${t(routeLabel(st))}</span>
+          <span class="fc-stat mono">${offline ? '' : `${t('jitter')} ${jitter}`}</span>
+          <span class="fc-stat mono">${offline ? '' : `${t('loss')} ${loss}`}</span>
+          <span class="fc-live">${t('live')} ●</span>
+        </div>
+        <div class="fc-ip mono" title="${s.ip}">${s.ip}</div>
+      </div>`;
+  }
+
+  return `
+    <div class="ping-card st-${st}">
+      <div class="pc-head">
+        <span class="pc-dot st-text-${st}">${dot}</span>
+        <div class="pc-names">
+          <div class="pc-name">${name}</div>
+          <div class="pc-region">${code} · ${offline ? t('offline') : region}</div>
+        </div>
+      </div>
+      <div class="pc-ping mono ${offline ? 'is-offline' : 'st-text-' + st}">${offline ? '—' : s.ping_ms}<small>${offline ? '' : ' ms'}</small></div>
+      ${offline ? `<div class="pc-offline">${t('offlineSub')}</div>` : sparkline(s.samples, st)}
+      <div class="pc-stats mono">${offline ? `<span>${t('offline')}</span>` : `<span>${t('jitter')} ${jitter}</span><span>${t('loss')} ${loss}</span>`}</div>
+    </div>`;
+}
 
 function renderValvePings(servers) {
   const grid = document.getElementById('ping-grid');
+  const slot = document.getElementById('best-route-slot');
   if (!grid || !Array.isArray(servers)) return;
 
+  const online = servers.filter((s) => s.ping_ms !== null && s.ping_ms !== undefined);
+  const best = online[0] || null; // backend sorts by ping; keep its order
+
+  if (slot) slot.innerHTML = best ? relayCardHtml(best, true) : '';
+
   grid.innerHTML = '';
-  let bestPing = Infinity;
-  let bestServerName = '';
-
   for (const s of servers) {
-    const hasPing = s.ping_ms !== null && s.ping_ms !== undefined;
-    let qualityClass = 'ping-timeout';
-    let msText = '-- ' + t('pingMs');
-
-    if (hasPing) {
-      const ms = s.ping_ms;
-      msText = `${ms} ${t('pingMs')}`;
-      if (ms < 80) qualityClass = 'ping-great';
-      else if (ms < 130) qualityClass = 'ping-good';
-      else if (ms < 180) qualityClass = 'ping-fair';
-      else qualityClass = 'ping-high';
-
-      if (ms < bestPing) {
-        bestPing = ms;
-        bestServerName = state.lang === 'fa' ? s.name_fa : (s.name || s.name_en);
-      }
-    }
-
+    if (best && s.id === best.id) continue; // featured separately
     const card = document.createElement('div');
-    card.className = `ping-card ${hasPing && s.ping_ms === bestPing ? 'is-best' : ''}`;
+    card.innerHTML = relayCardHtml(s, false);
+    const el = card.firstElementChild;
+    grid.appendChild(el);
+  }
+  // staggered rise
+  if (window.Motion) {
+    Motion.animate(grid.querySelectorAll('.ping-card'),
+      { opacity: [0, 1], transform: ['translateY(8px)', 'translateY(0px)'] },
+      { delay: Motion.stagger(0.05), duration: 0.3, easing: 'ease-out' });
+  }
 
-    const name = state.lang === 'fa' ? s.name_fa : (s.name || s.name_en);
-    card.innerHTML = `
-      <div class="ping-card-top">
-        <div class="ping-card-title">${name}</div>
-        <span class="ping-code-badge">${s.id.toUpperCase()}</span>
-      </div>
-      <div class="ping-card-bottom">
-        <span class="ping-ip" dir="ltr">${s.ip}</span>
-        <div class="ping-ms-pill ${qualityClass}">
-          <span class="ping-dot"></span>
-          <span class="ping-val">${msText}</span>
-        </div>
-      </div>
-    `;
-    grid.appendChild(card);
+  // footer: relays online + last test time
+  const footer = document.getElementById('net-footer');
+  const tag = document.getElementById('last-test-tag');
+  lastTestAt = Date.now();
+  const time = new Date(lastTestAt).toLocaleTimeString(state.lang === 'fa' ? 'fa-IR' : 'en-GB');
+  if (footer) {
+    footer.style.display = 'flex';
+    footer.innerHTML = `<span>${t('lastTest')} · ${time}</span><span>${online.length}/${servers.length} ${t('relaysOnline')}</span>`;
+  }
+  if (tag) {
+    tag.style.display = 'inline-flex';
+    tag.textContent = `● ${t('live')}`;
   }
 }
 
