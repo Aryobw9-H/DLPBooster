@@ -2600,3 +2600,16 @@ button:active,
 }
 .tier-perf { font-size: 0.6rem; letter-spacing: 3px; }
 .tier-delta { font-size: 0.64rem; line-height: 1.5; }
+
+
+/* ===================== PRESET CARDS v5 — BIGGER ===================== */
+.tiers-row { min-height: 190px; }
+.tier-card { padding: 16px 16px 18px; gap: 10px; }
+.tier-name {
+  padding: 18px 10px;
+  font-size: 1.45rem !important;
+  border-radius: 8px;
+  border-width: 2px;
+}
+.tier-perf { font-size: 0.68rem; letter-spacing: 3.5px; }
+.tier-delta { font-size: 0.72rem; }
