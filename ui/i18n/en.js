@@ -147,4 +147,7 @@ window.I18N_EN = {
   jitter: "JITTER",
   loss: "LOSS",
   useRegion: "USE THIS REGION",
+  statAvg: "AVG",
+  statMin: "MIN",
+  statMax: "MAX",
 };

@@ -2435,3 +2435,25 @@ button:active,
 @media (prefers-reduced-motion: reduce) {
   .ping-card, .featured-card { transition: none; }
 }
+
+/* ---- featured card additions: route score, rolling graph, range row ---- */
+.featured-card .fc-score {
+  font-family: 'Rajdhani', monospace;
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 2px;
+  border: 1px solid currentColor;
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+.featured-card .fc-range {
+  font-size: 0.62rem;
+  letter-spacing: 1.5px;
+  color: var(--text-muted, #64748b);
+  text-align: right;
+  margin-top: 2px;
+}
+.featured-card .spark-svg { height: 38px; margin: 6px 0 2px; }
+/* live sparkline pulse while testing */
+.testing .featured-card .spark-svg,
+.testing .ping-card .spark-svg { opacity: 0.75; }

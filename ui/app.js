@@ -467,8 +467,33 @@ function setFov(v) {
 let pingingActive = false;
 let lastTestAt = null;
 
+// rolling per-relay history: [{ms, t}] kept across tests (last 40 samples)
+const PING_HISTORY = {};
+const HISTORY_WINDOW_MS = 30000;
+
+function pushHistory(s) {
+  const now = Date.now();
+  const arr = (PING_HISTORY[s.id] = PING_HISTORY[s.id] || []);
+  if (s.ping_ms !== null && s.ping_ms !== undefined) arr.push({ ms: s.ping_ms, t: now });
+  // drop samples older than window
+  while (arr.length && now - arr[0].t > HISTORY_WINDOW_MS) arr.shift();
+  return arr;
+}
+
+function routeScore(s) {
+  // 0-100: latency + jitter + loss blend (backend stability already similar;
+  // this is the display score for RECOMMENDED selection)
+  if (s.ping_ms === null || s.ping_ms === undefined) return -1;
+  const ms = s.ping_ms;
+  const jitter = s.jitter_ms || 0;
+  const loss = s.loss_pct || 0;
+  const latScore = Math.max(0, 100 - (ms / 3));        // 300ms -> 0
+  const jitScore = Math.max(0, 100 - jitter * 4);      // 25ms jitter -> 0
+  const lossScore = Math.max(0, 100 - loss * 12);      // 8.3% -> 0
+  return Math.round(latScore * 0.45 + jitScore * 0.35 + lossScore * 0.2);
+}
+
 function qualityState(s) {
-  // state machine from REAL telemetry: offline -> unstable -> stable/excellent
   if (s.ping_ms === null || s.ping_ms === undefined) return 'offline';
   const ms = s.ping_ms;
   const jitter = s.jitter_ms || 0;
@@ -479,20 +504,20 @@ function qualityState(s) {
   return 'unstable';
 }
 
-function routeLabel(state) {
-  return { excellent: 'routeExcellent', stable: 'routeStable', unstable: 'routeUnstable', poor: 'routePoor', offline: 'offline' }[state] || 'routeStable';
-}
-
-function stateDot(state) {
-  return { excellent: '●', stable: '●', unstable: '◐', offline: '○', poor: '●' }[state] || '●';
+function scoreLabel(score) {
+  if (score >= 90) return { label: 'routeExcellent', cls: 'st-excellent' };
+  if (score >= 75) return { label: 'routeStable', cls: 'st-stable' };
+  if (score >= 55) return { label: 'routeUnstable', cls: 'st-unstable' };
+  return { label: 'routePoor', cls: 'st-poor' };
 }
 
 // inline sparkline: SVG polyline of real samples, 0-loss baseline
-function sparkline(samples, state) {
-  if (!samples || samples.length < 2) return '<div class="spark-flat"></div>';
-  const w = 460, h = 34, max = Math.max(...samples, 10) * 1.1;
-  const step = w / (samples.length - 1);
-  const pts = samples.map((v, i) => `${(i * step).toFixed(1)},${(h - (v / max) * h * 0.9 - 2).toFixed(1)}`).join(' ');
+function sparkline(history, state, wide) {
+  if (!history || history.length < 2) return '<div class="spark-flat"></div>';
+  const w = wide ? 460 : 200, h = wide ? 34 : 22;
+  const max = Math.max(...history, 10) * 1.1;
+  const step = w / (history.length - 1);
+  const pts = history.map((v, i) => `${(i * step).toFixed(1)},${(h - (v / max) * h * 0.9 - 2).toFixed(1)}`).join(' ');
   const cls = state === 'offline' ? 'spark offline' : state === 'unstable' ? 'spark bad' : state === 'stable' ? 'spark mid' : 'spark good';
   return `<svg class="spark-svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><polyline class="${cls}" points="${pts}" fill="none" stroke-width="1.5"/></svg>`;
 }
@@ -524,12 +549,16 @@ function relayCardHtml(s, featured) {
         </div>
         ${offline
           ? `<div class="fc-offline"><span class="fc-offline-x">╳</span> ${t('offline')}</div>`
-          : sparkline(s.samples, st)}
+          : sparkline(hist, st, true)}
+        ${offline ? '' : `<div class="fc-range mono">${t('statAvg')} ${avgV ?? '—'} · ${t('statMin')} ${minV ?? '—'} · ${t('statMax')} ${maxV ?? '—'} ms</div>`}
         <div class="fc-stats">
-          <span class="fc-dot st-text-${st}">${dot} ${t(routeLabel(st))}</span>
+          ${offline
+            ? `<span class="fc-dot st-text-offline">${dot} ${t('offline')}</span>`
+            : `<span class="fc-score st-text-${sl.cls}">ROUTE SCORE ${score}/100</span>
+               <span class="fc-dot st-text-${sl.cls}">${dot} ${t(sl.label)}</span>`}
           <span class="fc-stat mono">${offline ? '' : `${t('jitter')} ${jitter}`}</span>
           <span class="fc-stat mono">${offline ? '' : `${t('loss')} ${loss}`}</span>
-          <span class="fc-live">${t('live')} ●</span>
+          <span class="fc-live">${offline ? t('offline') : `${liveTxt} ●`}</span>
         </div>
         <div class="fc-ip mono" title="${s.ip}">${s.ip}</div>
       </div>`;
@@ -545,7 +574,7 @@ function relayCardHtml(s, featured) {
         </div>
       </div>
       <div class="pc-ping mono ${offline ? 'is-offline' : 'st-text-' + st}">${offline ? '—' : s.ping_ms}<small>${offline ? '' : ' ms'}</small></div>
-      ${offline ? `<div class="pc-offline">${t('offlineSub')}</div>` : sparkline(s.samples, st)}
+      ${offline ? `<div class="pc-offline">${t('offlineSub')}</div>` : sparkline(hist, st, false)}
       <div class="pc-stats mono">${offline ? `<span>${t('offline')}</span>` : `<span>${t('jitter')} ${jitter}</span><span>${t('loss')} ${loss}</span>`}</div>
     </div>`;
 }
@@ -556,7 +585,10 @@ function renderValvePings(servers) {
   if (!grid || !Array.isArray(servers)) return;
 
   const online = servers.filter((s) => s.ping_ms !== null && s.ping_ms !== undefined);
-  const best = online[0] || null; // backend sorts by ping; keep its order
+  // RECOMMENDED = best route score (latency + jitter + loss), not raw ping
+  const best = online.length
+    ? online.reduce((a, b) => (routeScore(b) > routeScore(a) ? b : a))
+    : null;
 
   if (slot) slot.innerHTML = best ? relayCardHtml(best, true) : '';
 
@@ -580,6 +612,7 @@ function renderValvePings(servers) {
   const tag = document.getElementById('last-test-tag');
   lastTestAt = Date.now();
   const time = new Date(lastTestAt).toLocaleTimeString(state.lang === 'fa' ? 'fa-IR' : 'en-GB');
+  startAgoTicker();
   if (footer) {
     footer.style.display = 'flex';
     footer.innerHTML = `<span>${t('lastTest')} · ${time}</span><span>${online.length}/${servers.length} ${t('relaysOnline')}</span>`;
@@ -588,6 +621,20 @@ function renderValvePings(servers) {
     tag.style.display = 'inline-flex';
     tag.textContent = `● ${t('live')}`;
   }
+}
+
+let agoTimer = null;
+function startAgoTicker() {
+  if (agoTimer) clearInterval(agoTimer);
+  agoTimer = setInterval(() => {
+    const footer = document.getElementById('net-footer');
+    if (!footer || !lastTestAt) return;
+    const ago = Math.max(0, Math.round((Date.now() - lastTestAt) / 1000));
+    const time = new Date(lastTestAt).toLocaleTimeString(state.lang === 'fa' ? 'fa-IR' : 'en-GB');
+    footer.innerHTML = `<span>${t('lastTest')} · ${time} (${ago}s)</span>`;
+    const fc = document.querySelector('.fc-live');
+    if (fc && !fc.textContent.includes(t('offline'))) fc.textContent = `${t('live')} · ${ago}s ●`;
+  }, 1000);
 }
 
 async function refreshValvePings() {

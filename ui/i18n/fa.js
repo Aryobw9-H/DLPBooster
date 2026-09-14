@@ -142,4 +142,7 @@ window.I18N_FA = {
   jitter: "JITTER",
   loss: "LOSS",
   useRegion: "USE THIS REGION",
+  statAvg: "AVG",
+  statMin: "MIN",
+  statMax: "MAX",
 };
