@@ -1292,6 +1292,16 @@ button:active,
   gap: 10px;
   box-sizing: border-box;
 }
+/* everything below the header scrolls as one page (featured card + relays + footer) */
+.latency-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-right: 2px;
+}
 
 .ping-view-header {
   display: flex;
@@ -2372,9 +2382,6 @@ button:active,
   grid-template-columns: repeat(3, 1fr);
   grid-auto-rows: min-content;
   gap: 8px;
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
   align-content: start;
   box-sizing: border-box;
 }

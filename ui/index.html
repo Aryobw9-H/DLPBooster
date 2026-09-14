@@ -226,13 +226,14 @@
                 </button>
               </div>
             </div>
-            <!-- BEST ROUTE: featured card -->
-            <div id="best-route-slot"></div>
-            <div class="relays-label" data-i18n="availableRelays">AVAILABLE RELAYS</div>
-            <div class="ping-grid" id="ping-grid">
-              <!-- remaining relays, dynamically populated -->
+            <!-- BEST ROUTE + relays + footer: one scrollable page -->
+            <div class="latency-scroll">
+              <div id="best-route-slot"></div>
+              <div class="ping-grid" id="ping-grid">
+                <!-- remaining relays, dynamically populated -->
+              </div>
+              <div class="net-footer" id="net-footer" style="display:none"></div>
             </div>
-            <div class="net-footer" id="net-footer" style="display:none"></div>
           </div>
         </div>
 
