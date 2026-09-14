@@ -32,7 +32,7 @@ window.I18N_EN = {
   tierPotatoDesc: "Absolute minimum for low-end rigs. Maximum smoothness in fights.",
   latencyNoticeTitle: "Input Latency Optimization Pipeline",
   latencyNoticeDesc: "Frame pacing and NVIDIA Reflex optimizations are automatically integrated into graphics presets. Granular latency tuning options will be available in the next update.",
-  unitStatus: "New Deadlock UI (unit status)",
+  unitStatus: "New Health bars",
   unitStatusDesc: "Writes citadel_unit_status_use_new to your autoexec.cfg on next install",
   install: "APPLY TO DEADLOCK",
   // fov panel

@@ -30,7 +30,7 @@ window.I18N_FA = {
   tierPotatoDesc: "حداقل مطلق برای سیستم‌های ضعیف؛ حداکثر روانی در فایت‌ها.",
   latencyNoticeTitle: "سیستم بهینه‌سازی تاخیر ورودی",
   latencyNoticeDesc: "تنظیمات Pacing فریم و Reflex به‌صورت خودکار در پریست‌های گرافیکی ادغام شده‌اند. گزینه‌های بیشتر تاخیر در آپدیت بعدی فعال خواهند شد.",
-  unitStatus: "رابط کاربری جدید ددلاک (وضعیت یونیت)",
+  unitStatus: "New Health bars",
   unitStatusDesc: "با نصب بعدی در autoexec.cfg شما نوشته می‌شود",
   install: "اعمال روی ددلاک",
   fovTitle: "زاویه دید (FOV)",

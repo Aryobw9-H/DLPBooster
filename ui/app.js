@@ -47,8 +47,7 @@ const state = {
   lastValvePings: null,
 };
 
-// FOV->aspect ratio map (fov.rs parity)
-const AR_TABLE = { 70: '1.60', 75: '1.70', 80: '1.75', 85: '1.95', 90: '2.15', 95: '2.32', 100: '2.49', 105: '2.64', 110: '2.79', 115: '2.94', 120: '3.09' };
+// FOV->aspect ratio map kept in backend (fov.rs); UI doesn't display it.
 
 // ---------- i18n ----------
 function t(key) {
@@ -462,18 +461,6 @@ function setFov(v) {
   state.fov = snapped;
   if (slider) slider.value = snapped;
   if (number) number.value = snapped;
-  const arPrev = document.getElementById('ar-preview');
-  if (arPrev) arPrev.textContent = AR_TABLE[snapped] || '2.15';
-  const fovSum = document.getElementById('fov-summary');
-  if (fovSum) {
-    fovSum.textContent = `FOV ${snapped} · AR ${AR_TABLE[snapped] || '2.15'}`;
-    // tick accent on change
-    fovSum.classList.add('tick');
-    setTimeout(() => fovSum.classList.remove('tick'), 220);
-  }
-  document.querySelectorAll('#chips-fov .chip-btn').forEach((b) => {
-    b.classList.toggle('active', Number(b.dataset.val) === snapped);
-  });
 }
 
 // ---------- valve game servers ping ----------
@@ -827,12 +814,6 @@ function init() {
         setFov(Number(slider ? slider.value : 90) + (e.deltaY < 0 ? 5 : -5));
       }, { passive: false });
     }
-    document.querySelectorAll('#chips-fov .chip-btn').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const val = Number(btn.dataset.val);
-        setFov(val);
-      });
-    });
     const btnFovReset = document.getElementById('btn-fov-reset');
     if (btnFovReset) {
       btnFovReset.onclick = () => setFov(90);
