@@ -1034,9 +1034,8 @@ button:active,
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
   width: 100%;
-  height: 72px;
-  min-height: 72px;
-  max-height: 72px;
+  height: auto;
+  min-height: 78px;
   box-sizing: border-box;
   flex-shrink: 0;
 }
@@ -1118,7 +1117,8 @@ button:active,
   border: 1px solid rgba(234, 179, 8, 0.4);
 }
 
-.tier-pick {
+.tier-pick { display: none; /* radios removed — card highlight is the selection state */
+
   width: 14px;
   height: 14px;
   min-width: 14px;
@@ -1130,7 +1130,8 @@ button:active,
   box-sizing: border-box;
 }
 
-.tier-card.selected .tier-pick {
+.tier-card.selected .tier-pick { display: none; /* radios removed — card highlight is the selection state */
+
   background: var(--deadlock-orange);
   border-color: var(--deadlock-orange);
   box-shadow: 0 0 10px var(--deadlock-orange-glow);
@@ -1697,7 +1698,8 @@ button:active,
   background: rgba(249, 115, 22, 0.15);
 }
 
-.tier-card-sm .tier-pick {
+.tier-card-sm .tier-pick { display: none; /* radios removed — card highlight is the selection state */
+
   width: 12px;
   height: 12px;
   min-width: 12px;
@@ -1790,7 +1792,8 @@ button:active,
 
 /* tier card pick glow pulse when selected */
 .tier-card.selected .tier-pick,
-.tier-card-sm.selected .tier-pick {
+.tier-card-sm.selected .tier-pick { display: none; /* radios removed — card highlight is the selection state */
+
   animation: dlp-pulse 1.6s ease-in-out infinite;
 }
 @keyframes dlp-pulse {
@@ -2455,3 +2458,63 @@ button:active,
   background-clip: padding-box;
 }
 ::-webkit-scrollbar-corner { background: transparent; }
+
+
+/* ===================== PRESET CARDS v2 (no radios, delta hints) ===================== */
+.tier-card { align-items: flex-start; text-align: start; gap: 3px; padding: 8px 11px; }
+.tier-card-header { width: 100%; display: flex; align-items: center; justify-content: space-between; }
+.tier-perf {
+  font-family: 'Rajdhani', monospace;
+  font-size: 0.56rem;
+  letter-spacing: 2px;
+  color: var(--text-muted, #64748b);
+}
+.tier-card.selected .tier-perf { color: var(--deadlock-orange, #f97316); }
+.tier-delta {
+  font-family: 'Rajdhani', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.5px;
+  color: var(--text-muted, #64748b);
+  line-height: 1.4;
+}
+.tier-card:hover .tier-delta { color: var(--text-secondary, #94a3b8); }
+/* radio circles: hidden everywhere (header + sm cards) */
+.tier-pick, .tier-card-sm .tier-pick { display: none !important; }
+.tier-card.selected, .tier-card-sm.selected {
+  border-color: rgba(249, 115, 22, 0.75);
+  background: rgba(249, 115, 22, 0.08);
+}
+
+/* ===================== SETTINGS COLUMNS (Camera | HUD) ===================== */
+.settings-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+.setting-col {
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 4px;
+  padding: 8px 12px 10px;
+  background: rgba(10, 15, 24, 0.4);
+}
+.setting-col-title {
+  font-family: 'Rajdhani', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 2.5px;
+  color: var(--text-muted, #64748b);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.setting-col .fov-slider-bar { margin: 0; }
+.setting-col .hud-switch-wrap { margin: 0; justify-content: flex-start; }
+
+/* ===================== COMPACT PANEL — hug content, kill the void ===================== */
+.content-viewport {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+}
+.panel { flex: 1 1 auto; }

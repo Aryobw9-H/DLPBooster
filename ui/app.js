@@ -709,6 +709,14 @@ function selectCardByKey(tabKey) {
   document.querySelectorAll('.pro-card, .sci-card').forEach((card) => card.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('section-title').textContent = t(SECTION_TITLES[tabKey] || 'presetsTitle');
+  // icon identity 1:1 with feature (graphic=desktop, latency=bolt, advanced=sliders)
+  const ICONS = { graphic: 'fa-desktop', latency: 'fa-bolt', advanced: 'fa-sliders' };
+  const iconEl = document.getElementById('section-icon');
+  if (iconEl && ICONS[tabKey]) {
+    iconEl.className = 'fa-solid ' + ICONS[tabKey];
+    iconEl.style.fontSize = '13px';
+    iconEl.style.color = 'var(--deadlock-orange)';
+  }
   for (const p of PANELS) {
     const pan = document.getElementById(`panel-${p}`);
     if (pan) pan.style.display = p === tabKey ? 'block' : 'none';

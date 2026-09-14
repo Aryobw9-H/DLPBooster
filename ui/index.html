@@ -115,7 +115,7 @@
       <section class="content-viewport">
         <div class="content-header">
           <div class="content-header-title">
-            <i class="fa-solid fa-bolt" style="font-size:13px;color:var(--deadlock-orange)"></i>
+            <i class="fa-solid fa-desktop" id="section-icon" style="font-size:13px;color:var(--deadlock-orange)"></i>
             <span id="section-title">تنظیمات گرافیکی</span>
           </div>
           <span class="detect-badge" id="detect-badge" style="font-size: 0.8rem; color: var(--deadlock-cyan);"></span>
@@ -127,40 +127,44 @@
             
             <!-- 4 Graphic Presets Row (High, Medium, Low, Potato) -->
             <div class="tiers-row">
-              <div class="tier-card selected" data-mode="T1" onclick="selectPreset('T1')">        <span class="border-beam"><span class="beam"></span></span>
-                
+              <div class="tier-card selected" data-mode="T1" onclick="selectPreset('T1')">
+                <span class="border-beam"><span class="beam"></span></span>
                 <div class="tier-card-header">
                   <span class="tier-badge t1">T1</span>
-                  <div class="tier-pick"></div>
+                  <span class="tier-perf" data-i18n="perfMaxFidelity">MAX FIDELITY</span>
                 </div>
-                <div class="tier-name" data-i18n="tierHigh">گرافیک بالا</div>
+                <div class="tier-name" data-i18n="tierHigh">MAX FIDELITY</div>
+                <div class="tier-delta">Shadows: HIGH · Particles: FULL · Textures: NATIVE</div>
               </div>
 
-              <div class="tier-card" data-mode="T2" onclick="selectPreset('T2')">        <span class="border-beam"><span class="beam"></span></span>
-                
+              <div class="tier-card" data-mode="T2" onclick="selectPreset('T2')">
+                <span class="border-beam"><span class="beam"></span></span>
                 <div class="tier-card-header">
                   <span class="tier-badge t2">T2</span>
-                  <div class="tier-pick"></div>
+                  <span class="tier-perf" data-i18n="perfBalanced">BALANCED</span>
                 </div>
-                <div class="tier-name" data-i18n="tierMed">گرافیک متوسط</div>
+                <div class="tier-name" data-i18n="tierMed">BALANCED</div>
+                <div class="tier-delta">Shadows: MED · Particles: LOW · Textures: HIGH</div>
               </div>
 
-              <div class="tier-card" data-mode="T3" onclick="selectPreset('T3')">        <span class="border-beam"><span class="beam"></span></span>
-                
+              <div class="tier-card" data-mode="T3" onclick="selectPreset('T3')">
+                <span class="border-beam"><span class="beam"></span></span>
                 <div class="tier-card-header">
                   <span class="tier-badge t3">T3</span>
-                  <div class="tier-pick"></div>
+                  <span class="tier-perf" data-i18n="perfMaxFps">MAX FPS</span>
                 </div>
-                <div class="tier-name" data-i18n="tierLow">گرافیگ پایین</div>
+                <div class="tier-name" data-i18n="tierLow">MAX FPS</div>
+                <div class="tier-delta">Shadows: LOW · Particles: CULLED · Ragdolls: OFF</div>
               </div>
 
-              <div class="tier-card" data-mode="POTATO" onclick="selectPreset('POTATO')">        <span class="border-beam"><span class="beam"></span></span>
-                
+              <div class="tier-card" data-mode="POTATO" onclick="selectPreset('POTATO')">
+                <span class="border-beam"><span class="beam"></span></span>
                 <div class="tier-card-header">
-                  <span class="tier-badge potato">POTATO</span>
-                  <div class="tier-pick"></div>
+                  <span class="tier-badge potato">P4</span>
+                  <span class="tier-perf" data-i18n="perfPotato">POTATO</span>
                 </div>
-                <div class="tier-name" data-i18n="tierPotato">گرافیک ذغالی</div>
+                <div class="tier-name" data-i18n="tierPotato">POTATO</div>
+                <div class="tier-delta">Textures: STRIPPED · All FX: OFF · Absolute max FPS</div>
               </div>
             </div>
 
@@ -172,8 +176,27 @@
                   <span class="fov-box-title" data-i18n="fovTitle">زاویه دید (FOV)</span>
                 </div>
                 <div class="fov-box-header-actions">
-                  <label class="hud-switch-wrap" title="رابط کاربری جدید ددلاک">
-                    <span class="hud-switch-label" data-i18n="unitStatus">رابط کاربری جدید ددلاک</span>
+                  <button class="btn-reset btn-sm" id="btn-fov-reset" onclick="setFov(90)">
+                    <span data-i18n="btnFovReset">Reset 90°</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Two functional columns: CAMERA | HUD -->
+              <div class="settings-columns">
+                <div class="setting-col">
+                  <div class="setting-col-title"><i class="fa-solid fa-eye" style="font-size:12px"></i> CAMERA</div>
+                  <div class="fov-slider-bar">
+                    <span class="fov-bound">70°</span>
+                    <input type="range" id="fov-slider" min="70" max="120" step="5" value="90" class="fov-range-input" />
+                    <span class="fov-bound">120°</span>
+                    <input type="number" id="fov-number" min="70" max="120" step="5" value="90" dir="ltr" class="path-input fov-num-input" />
+                  </div>
+                </div>
+                <div class="setting-col">
+                  <div class="setting-col-title"><i class="fa-solid fa-heart-pulse" style="font-size:12px"></i> HUD</div>
+                  <label class="hud-switch-wrap" title="New Health bars">
+                    <span class="hud-switch-label" data-i18n="unitStatus">New Health bars</span>
                     <label class="neon-checkbox">
                       <input type="checkbox" id="sw-unit-status">
                       <div class="neon-checkbox__frame">
@@ -192,18 +215,7 @@
                       </div>
                     </label>
                   </label>
-                  <button class="btn-reset btn-sm" id="btn-fov-reset" onclick="setFov(90)">
-                    <span data-i18n="btnFovReset">ریست به ۹۰</span>
-                  </button>
                 </div>
-              </div>
-
-              <!-- Slider + Number Control Bar -->
-              <div class="fov-slider-bar">
-                <span class="fov-bound">70°</span>
-                <input type="range" id="fov-slider" min="70" max="120" step="5" value="90" class="fov-range-input" />
-                <span class="fov-bound">120°</span>
-                <input type="number" id="fov-number" min="70" max="120" step="5" value="90" dir="ltr" class="path-input fov-num-input" />
               </div>
             </div>
 

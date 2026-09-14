@@ -20,7 +20,7 @@ window.I18N_EN = {
   cardAdvanced: "Advanced",
   cardAdvancedDesc: "Backup, vanilla restore & tester tools",
   // preset panel
-  presetsTitle: "Graphic Settings",
+  presetsTitle: "GRAPHIC SETTINGS",
   profileLabel: "profile: visual fidelity",
   tierHigh: "High graphics",
   tierHighDesc: "Conservative cuts. Highest visual fidelity with optimized framerates.",
@@ -36,7 +36,7 @@ window.I18N_EN = {
   unitStatusDesc: "Writes citadel_unit_status_use_new to your autoexec.cfg on next install",
   install: "APPLY TO DEADLOCK",
   // fov panel
-  fovTitle: "Field of view",
+  fovTitle: "FIELD OF VIEW",
   fovValue: "FOV",
   aspect: "Aspect ratio",
   applied: "Applied on next install",
@@ -44,7 +44,7 @@ window.I18N_EN = {
   fovPresetsDesc: "Quick select standard or ultrawide angle",
   fovResetTitle: "Reset Field of View",
   fovResetDesc: "Reset back to Deadlock default FOV (90 degrees)",
-  btnFovReset: "Reset to 90",
+  btnFovReset: "Reset 90",
   // advanced panel
   advTitle: "Backup & restore",
   backupNow: "BACK UP NOW",
@@ -150,4 +150,8 @@ window.I18N_EN = {
   statAvg: "AVG",
   statMin: "MIN",
   statMax: "MAX",
+  perfMaxFidelity: "MAX FIDELITY",
+  perfBalanced: "BALANCED",
+  perfMaxFps: "MAX FPS",
+  perfPotato: "POTATO",
 };
