@@ -2457,3 +2457,10 @@ button:active,
 /* live sparkline pulse while testing */
 .testing .featured-card .spark-svg,
 .testing .ping-card .spark-svg { opacity: 0.75; }
+
+/* text-color state variants for dots/scores */
+.st-text-excellent { color: #4ade80; }
+.st-text-stable    { color: #38bdf8; }
+.st-text-unstable  { color: #fbbf24; }
+.st-text-poor      { color: #f87171; }
+.st-text-offline   { color: #64748b; }

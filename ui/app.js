@@ -513,6 +513,14 @@ function scoreLabel(score) {
   return { label: 'routePoor', cls: 'st-poor' };
 }
 
+function routeLabel(state) {
+  return { excellent: 'routeExcellent', stable: 'routeStable', unstable: 'routeUnstable', poor: 'routePoor', offline: 'offline' }[state] || 'routeStable';
+}
+
+function stateDot(state) {
+  return { excellent: '●', stable: '●', unstable: '◐', offline: '○', poor: '●' }[state] || '●';
+}
+
 // inline sparkline: SVG polyline of real samples, 0-loss baseline
 function sparkline(history, state, wide) {
   if (!history || history.length < 2) return '<div class="spark-flat"></div>';
