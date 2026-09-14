@@ -2567,3 +2567,36 @@ button:active,
 .setting-box .btn-reset { padding: 3px 10px; font-size: 0.62rem; }
 .hud-switch-wrap { gap: 6px; }
 .hud-switch-label { font-size: 0.72rem; }
+
+
+/* ===================== PRESET CARDS v4 — name boxed, huge, bold ===================== */
+.tiers-row { min-height: 150px; }
+.tier-card {
+  padding: 12px 14px 14px;
+  gap: 8px;
+  justify-content: center;
+}
+.tier-name {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px 8px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 6px;
+  background: rgba(2, 6, 12, 0.55);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.18rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 1.5px;
+  text-align: center;
+  white-space: normal;
+  line-height: 1.25;
+}
+.tier-card.selected .tier-name {
+  border-color: rgba(249, 115, 22, 0.7);
+  background: rgba(249, 115, 22, 0.1);
+  color: #fff;
+}
+.tier-perf { font-size: 0.6rem; letter-spacing: 3px; }
+.tier-delta { font-size: 0.64rem; line-height: 1.5; }
