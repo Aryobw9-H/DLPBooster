@@ -708,8 +708,23 @@ function selectCardByKey(tabKey) {
   }
   const badge = document.getElementById('detect-badge');
   if (badge) badge.style.display = tabKey === 'graphic' ? '' : 'none';
-  if (tabKey === 'latency') refreshValvePings();
+  if (tabKey === 'latency') { refreshValvePings(); startContinuousPing(); }
+  else stopContinuousPing();
   if (tabKey === 'advanced') renderBackups();
+}
+
+// continuous monitoring: re-test every 15s while the latency tab is open
+let pingLoop = null;
+function startContinuousPing() {
+  stopContinuousPing();
+  pingLoop = setInterval(() => {
+    const panel = document.getElementById('panel-latency');
+    if (panel && panel.style.display !== 'none') refreshValvePings();
+    else stopContinuousPing();
+  }, 15000);
+}
+function stopContinuousPing() {
+  if (pingLoop) { clearInterval(pingLoop); pingLoop = null; }
 }
 
 function getWin() {
