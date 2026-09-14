@@ -553,33 +553,28 @@ function relayCardHtml(s, featured) {
 
   if (featured) {
     return `
-      <div class="featured-card st-${st}">
-        <div class="fc-tag">✦ ${t('recommended')}</div>
-        <div class="fc-head">
-          <div>
-            <div class="fc-name">${name}</div>
-            <div class="fc-region">${region} · ${code}</div>
+      <div class="featured-card">
+        <div class="fc-tag">✦ ${t('recommended')} — ${t('bestRoute')}</div>
+        <div class="fc-main">
+          <div class="fc-left">
+            <div class="fc-name">${name} <span class="fc-code">${code}</span></div>
+            <div class="fc-region">${region}</div>
+            <div class="fc-spark">${offline ? '<div class="spark-flat"></div>' : sparkline(hist, st, true)}</div>
+            <div class="fc-stats">
+              ${offline
+                ? `<span class="fc-dot st-text-offline">${dot} ${t('offline')}</span>`
+                : `<span class="fc-dot st-text-${st}">${dot} ${t(routeLabel(st))}</span>
+                   <span class="fc-stat mono">${t('jitter')} ${jitter}</span>
+                   <span class="fc-stat mono">${t('loss')} ${loss}</span>`}
+              <span class="fc-live">${offline ? t('offline') : `${liveTxt} ●`}</span>
+            </div>
+            <div class="fc-ip mono" title="${s.ip}">${s.ip}</div>
           </div>
-          <div class="fc-code">${code}</div>
+          <div class="fc-ping-wrap">
+            <div class="fc-ping">${offline ? '—' : s.ping_ms}</div>
+            <div class="fc-ms">${offline ? '' : 'ms'}</div>
+          </div>
         </div>
-        <div class="fc-ping-wrap">
-          <div class="fc-ping">${offline ? '—' : s.ping_ms}</div>
-          <div class="fc-ms">${offline ? '' : 'ms'}</div>
-        </div>
-        ${offline
-          ? `<div class="fc-offline"><span class="fc-offline-x">╳</span> ${t('offline')}</div>`
-          : sparkline(hist, st, true)}
-        ${offline ? '' : `<div class="fc-range mono">${t('statAvg')} ${avgV ?? '—'} · ${t('statMin')} ${minV ?? '—'} · ${t('statMax')} ${maxV ?? '—'} ms</div>`}
-        <div class="fc-stats">
-          ${offline
-            ? `<span class="fc-dot st-text-offline">${dot} ${t('offline')}</span>`
-            : `<span class="fc-score st-text-${sl.cls}">ROUTE SCORE ${score}/100</span>
-               <span class="fc-dot st-text-${sl.cls}">${dot} ${t(sl.label)}</span>`}
-          <span class="fc-stat mono">${offline ? '' : `${t('jitter')} ${jitter}`}</span>
-          <span class="fc-stat mono">${offline ? '' : `${t('loss')} ${loss}`}</span>
-          <span class="fc-live">${offline ? t('offline') : `${liveTxt} ●`}</span>
-        </div>
-        <div class="fc-ip mono" title="${s.ip}">${s.ip}</div>
       </div>`;
   }
 
@@ -593,8 +588,7 @@ function relayCardHtml(s, featured) {
         </div>
       </div>
       <div class="pc-ping mono ${offline ? 'is-offline' : 'st-text-' + st}">${offline ? '—' : s.ping_ms}<small>${offline ? '' : ' ms'}</small></div>
-      ${offline ? `<div class="pc-offline">${t('offlineSub')}</div>` : sparkline(hist, st, false)}
-      <div class="pc-stats mono">${offline ? `<span>${t('offline')}</span>` : `<span>${t('jitter')} ${jitter}</span><span>${t('loss')} ${loss}</span>`}</div>
+      <div class="pc-stats mono">${offline ? `<span>${t('offline')}</span>` : `<span class="st-text-${st}">${dot} ${t(routeLabel(st))}</span>`}</div>
     </div>`;
 }
 
@@ -616,9 +610,9 @@ function renderValvePings(servers) {
   for (const s of servers) {
     pushHistory(s);
     if (best && s.id === best.id) continue; // featured separately
-    const card = document.createElement('div');
-    card.innerHTML = relayCardHtml(s, false);
-    const el = card.firstElementChild;
+    const tpl = document.createElement('template');
+    tpl.innerHTML = relayCardHtml(s, false).trim();
+    const el = tpl.content.firstElementChild;
     grid.appendChild(el);
   }
   // staggered rise

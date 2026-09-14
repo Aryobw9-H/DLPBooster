@@ -2292,14 +2292,14 @@ button:active,
 .st-poor      { color: #f87171; }
 .st-offline   { color: #64748b; }
 
-/* ---- featured BEST ROUTE card ---- */
+/* ---- featured BEST ROUTE card (horizontal, compact) ---- */
 #best-route-slot { flex-shrink: 0; }
 .featured-card {
   position: relative;
   border: 1px solid rgba(249, 115, 22, 0.4);
   border-radius: 4px;
   background: rgba(10, 15, 24, 0.85);
-  padding: 8px 14px 8px;
+  padding: 9px 14px 8px;
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -2308,34 +2308,37 @@ button:active,
   font-size: 0.6rem;
   letter-spacing: 3px;
   color: var(--deadlock-orange, #f97316);
-  margin-bottom: 3px;
+  margin-bottom: 2px;
 }
-.featured-card .fc-head { display: flex; justify-content: space-between; align-items: flex-start; }
-.featured-card .fc-name { font-size: 1.05rem; font-weight: 800; letter-spacing: 1px; }
-.featured-card .fc-region { font-family: 'Rajdhani', monospace; font-size: 0.62rem; letter-spacing: 2px; color: var(--text-muted, #64748b); margin-top: 2px; }
+.featured-card .fc-main { display: flex; align-items: center; gap: 18px; }
+.featured-card .fc-left { flex: 1 1 auto; min-width: 0; }
+.featured-card .fc-name { font-size: 1rem; font-weight: 800; letter-spacing: 1px; }
 .featured-card .fc-code {
   font-family: 'Rajdhani', monospace;
-  font-size: 0.9rem;
+  font-size: 0.68rem;
   font-weight: 700;
   color: var(--deadlock-orange, #f97316);
   border: 1px solid rgba(249, 115, 22, 0.4);
-  padding: 2px 8px;
+  padding: 1px 6px;
   border-radius: 3px;
+  margin-inline-start: 8px;
+  vertical-align: middle;
 }
-.featured-card .fc-ping-wrap { display: flex; align-items: baseline; justify-content: flex-end; gap: 6px; margin: 0; }
+.featured-card .fc-region { font-family: 'Rajdhani', monospace; font-size: 0.6rem; letter-spacing: 2px; color: var(--text-muted, #64748b); margin: 2px 0 4px; }
+.featured-card .fc-ping-wrap { display: flex; align-items: baseline; gap: 5px; flex-shrink: 0; }
 .featured-card .fc-ping {
   font-family: 'Rajdhani', monospace;
-  font-size: 2.9rem;
+  font-size: 2.6rem;
   font-weight: 700;
   line-height: 1;
   color: #f8fafc;
 }
-.featured-card .fc-ms { font-family: 'Rajdhani', monospace; font-size: 0.8rem; color: var(--text-muted, #64748b); }
+.featured-card .fc-ms { font-family: 'Rajdhani', monospace; font-size: 0.75rem; color: var(--text-muted, #64748b); }
 .featured-card .fc-stats {
   display: flex;
-  gap: 14px;
+  gap: 12px;
   align-items: center;
-  font-size: 0.7rem;
+  font-size: 0.66rem;
   margin-top: 4px;
   flex-wrap: wrap;
 }
@@ -2344,24 +2347,17 @@ button:active,
 .featured-card .fc-live {
   margin-left: auto;
   font-family: 'Rajdhani', monospace;
-  font-size: 0.62rem;
+  font-size: 0.6rem;
   letter-spacing: 2px;
   color: #4ade80;
 }
 .featured-card .fc-ip {
-  margin-top: 3px;
-  font-size: 0.62rem;
-  color: rgba(148, 163, 184, 0.45);
+  margin-top: 2px;
+  font-size: 0.6rem;
+  color: rgba(148, 163, 184, 0.38);
   direction: ltr;
 }
-.featured-card .fc-offline {
-  font-family: 'Rajdhani', monospace;
-  color: var(--text-muted, #64748b);
-  letter-spacing: 2px;
-  text-align: right;
-  font-size: 0.8rem;
-  padding: 12px 0;
-}
+.featured-card .fc-spark { margin: 2px 0 3px; }
 
 /* ---- sparkline ---- */
 .spark-svg { width: 100%; height: 30px; display: block; margin: 4px 0 2px; }
@@ -2370,7 +2366,7 @@ button:active,
 .spark-bad  { stroke: #fbbf24; }
 .spark.offline, .spark-flat { height: 30px; border-bottom: 1px dashed rgba(148,163,184,0.25); }
 
-/* ---- small relay cards ---- */
+/* ---- small relay cards: name+code / big ms / state — 3 tight rows ---- */
 .ping-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -2379,6 +2375,7 @@ button:active,
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
+  align-content: start;
   box-sizing: border-box;
 }
 .ping-card {
@@ -2387,15 +2384,14 @@ button:active,
   border-left-width: 2px;
   border-radius: 3px;
   background: rgba(11, 19, 33, 0.75);
-  padding: 7px 10px;
+  padding: 8px 10px;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
   box-sizing: border-box;
   transition: transform 0.2s ease, border-color 0.2s ease;
   overflow: hidden;
 }
-/* state accent: left border line, nothing else */
 .ping-card.st-excellent { border-left-color: #4ade80; }
 .ping-card.st-stable    { border-left-color: #38bdf8; }
 .ping-card.st-unstable  { border-left-color: #fbbf24; }
@@ -2404,63 +2400,32 @@ button:active,
 .ping-card .pc-head { display: flex; align-items: center; gap: 7px; }
 .ping-card .pc-dot { font-size: 0.7rem; line-height: 1; }
 .ping-card .pc-name { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.5px; }
-.ping-card .pc-region { font-family: 'Rajdhani', monospace; font-size: 0.58rem; letter-spacing: 1.5px; color: var(--text-muted, #64748b); }
+.ping-card .pc-region { font-family: 'Rajdhani', monospace; font-size: 0.56rem; letter-spacing: 1.5px; color: var(--text-muted, #64748b); }
 .ping-card .pc-ping {
   font-family: 'Rajdhani', monospace;
-  font-size: 1.35rem;
+  font-size: 1.5rem;
   font-weight: 700;
   line-height: 1;
   text-align: right;
 }
-.ping-card .pc-ping small { font-size: 0.6rem; color: var(--text-muted, #64748b); margin-inline-start: 3px; }
+.ping-card .pc-ping small { font-size: 0.58rem; color: var(--text-muted, #64748b); margin-inline-start: 3px; }
 .ping-card .pc-ping.is-offline { color: var(--text-muted, #64748b); }
 .ping-card .pc-offline {
   font-family: 'Rajdhani', monospace;
-  font-size: 0.6rem;
+  font-size: 0.58rem;
   letter-spacing: 2px;
   color: var(--text-muted, #64748b);
   text-align: right;
-  padding: 6px 0;
-  border-bottom: 1px dashed rgba(148,163,184,0.25);
 }
 .ping-card .pc-stats {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   font-size: 0.6rem;
   color: var(--text-secondary, #94a3b8);
   letter-spacing: 1px;
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+  padding-top: 4px;
 }
-.ping-card .spark-svg { height: 22px; margin: 2px 0; }
-
 @media (prefers-reduced-motion: reduce) {
   .ping-card, .featured-card { transition: none; }
 }
-
-/* ---- featured card additions: route score, rolling graph, range row ---- */
-.featured-card .fc-score {
-  font-family: 'Rajdhani', monospace;
-  font-weight: 700;
-  font-size: 0.72rem;
-  letter-spacing: 2px;
-  border: 1px solid currentColor;
-  padding: 2px 8px;
-  border-radius: 3px;
-}
-.featured-card .fc-range {
-  font-size: 0.62rem;
-  letter-spacing: 1.5px;
-  color: var(--text-muted, #64748b);
-  text-align: right;
-  margin-top: 2px;
-}
-.featured-card .spark-svg { height: 38px; margin: 6px 0 2px; }
-/* live sparkline pulse while testing */
-.testing .featured-card .spark-svg,
-.testing .ping-card .spark-svg { opacity: 0.75; }
-
-/* text-color state variants for dots/scores */
-.st-text-excellent { color: #4ade80; }
-.st-text-stable    { color: #38bdf8; }
-.st-text-unstable  { color: #fbbf24; }
-.st-text-poor      { color: #f87171; }
-.st-text-offline   { color: #64748b; }
