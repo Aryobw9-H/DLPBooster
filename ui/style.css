@@ -1034,8 +1034,8 @@ button:active,
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
   width: 100%;
-  height: auto;
-  min-height: 78px;
+  height: 72px;
+  min-height: 72px;
   box-sizing: border-box;
   flex-shrink: 0;
 }
@@ -2460,25 +2460,7 @@ button:active,
 ::-webkit-scrollbar-corner { background: transparent; }
 
 
-/* ===================== PRESET CARDS v2 (no radios, delta hints) ===================== */
-.tier-card { align-items: flex-start; text-align: start; gap: 3px; padding: 8px 11px; }
-.tier-card-header { width: 100%; display: flex; align-items: center; justify-content: space-between; }
-.tier-perf {
-  font-family: 'Rajdhani', monospace;
-  font-size: 0.56rem;
-  letter-spacing: 2px;
-  color: var(--text-muted, #64748b);
-}
-.tier-card.selected .tier-perf { color: var(--deadlock-orange, #f97316); }
-.tier-delta {
-  font-family: 'Rajdhani', monospace;
-  font-size: 0.58rem;
-  letter-spacing: 0.5px;
-  color: var(--text-muted, #64748b);
-  line-height: 1.4;
-}
-.tier-card:hover .tier-delta { color: var(--text-secondary, #94a3b8); }
-/* radio circles: hidden everywhere (header + sm cards) */
+/* ===================== PRESET CARDS: radios removed, classic badges ===================== */
 .tier-pick, .tier-card-sm .tier-pick { display: none !important; }
 .tier-card.selected, .tier-card-sm.selected {
   border-color: rgba(249, 115, 22, 0.75);
@@ -2546,18 +2528,6 @@ button:active,
 .content-viewport { display: flex; flex-direction: column; }
 
 
-/* ===================== PRESET CARDS v3 — name is the hero ===================== */
-.tier-card { padding: 12px 14px; gap: 5px; }
-.tier-perf { order: -1; font-size: 0.55rem; letter-spacing: 2.5px; }
-.tier-name {
-  font-family: 'Orbitron', 'Rajdhani', sans-serif;
-  font-size: 0.95rem;
-  font-weight: 700;
-  letter-spacing: 1px;
-}
-.tier-delta { font-size: 0.62rem; }
-.tiers-row { min-height: 96px; }
-
 /* duo boxes demoted: compact secondary row */
 .settings-duo { gap: 8px; margin-top: 8px; }
 .setting-box { padding: 7px 12px 9px; gap: 5px; }
@@ -2569,47 +2539,3 @@ button:active,
 .hud-switch-label { font-size: 0.72rem; }
 
 
-/* ===================== PRESET CARDS v4 — name boxed, huge, bold ===================== */
-.tiers-row { min-height: 150px; }
-.tier-card {
-  padding: 12px 14px 14px;
-  gap: 8px;
-  justify-content: center;
-}
-.tier-name {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  padding: 12px 8px;
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  border-radius: 6px;
-  background: rgba(2, 6, 12, 0.55);
-  font-family: 'Orbitron', sans-serif;
-  font-size: 1.18rem !important;
-  font-weight: 800 !important;
-  letter-spacing: 1.5px;
-  text-align: center;
-  white-space: normal;
-  line-height: 1.25;
-}
-.tier-card.selected .tier-name {
-  border-color: rgba(249, 115, 22, 0.7);
-  background: rgba(249, 115, 22, 0.1);
-  color: #fff;
-}
-.tier-perf { font-size: 0.6rem; letter-spacing: 3px; }
-.tier-delta { font-size: 0.64rem; line-height: 1.5; }
-
-
-/* ===================== PRESET CARDS v5 — BIGGER ===================== */
-.tiers-row { min-height: 190px; }
-.tier-card { padding: 16px 16px 18px; gap: 10px; }
-.tier-name {
-  padding: 18px 10px;
-  font-size: 1.45rem !important;
-  border-radius: 8px;
-  border-width: 2px;
-}
-.tier-perf { font-size: 0.68rem; letter-spacing: 3.5px; }
-.tier-delta { font-size: 0.72rem; }
