@@ -413,7 +413,7 @@ pub async fn ping_valve_servers() -> Result<Vec<ServerPing>, String> {
     let (tx, rx) = mpsc::channel();
     let mut handles = vec![];
 
-    const SAMPLES: u32 = 12;
+    const SAMPLES: u32 = 6;
     for s in VALVE_SERVERS {
         let tx = tx.clone();
         let s = s.clone();
@@ -424,7 +424,7 @@ pub async fn ping_valve_servers() -> Result<Vec<ServerPing>, String> {
                 if let Some(ms) = ping_single_ip(s.ip, 1200) {
                     ok.push(ms);
                 }
-                std::thread::sleep(std::time::Duration::from_millis(25));
+                std::thread::sleep(std::time::Duration::from_millis(20));
             }
             p.loss_pct = ((SAMPLES - ok.len() as u32) as f32 / SAMPLES as f32) * 100.0;
             if !ok.is_empty() {
