@@ -1,8 +1,16 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 mod commands;
+mod webview_check;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    // First-run guidance: if the WebView2 Evergreen Runtime is missing the
+    // window would fail silently — show the guided download dialog instead.
+    #[cfg(windows)]
+    if webview_check::runtime_version().is_none() {
+        webview_check::guide_download_and_exit();
+    }
+
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
