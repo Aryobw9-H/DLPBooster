@@ -84,7 +84,7 @@ window.I18N_FA = {
   // Valve Ping
   valvePingTitle: "DEADLOCK RELAY NETWORK",
   btnRefreshPing: "بروزرسانی پینگ",
-  pingTesting: "در حال سنجش پینگ...",
+  pingTesting: "تست پینگ...",
   bestServer: "بهترین سرور برای شما: ",
   pingMs: "ms",
   pingTimeout: "عدم پاسخ",
