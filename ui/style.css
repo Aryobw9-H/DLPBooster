@@ -2764,3 +2764,11 @@ body.lang-fa .step-log { text-align: left; } /* log stays LTR monospace */
 .setting-box:last-child .hud-switch-wrap { margin: 0; }
 .setting-box:last-child .neon-checkbox { --size: 22px; }
 .setting-box:last-child .hud-switch-label { font-size: 0.78rem; }
+
+
+/* ===================== BOX SIZING: taller preset cards, FOV = HUD equal height ===================== */
+.settings-duo { align-items: stretch; }
+.setting-box { padding: 12px 14px; gap: 8px; }
+.setting-box:last-child { padding: 12px 14px; }
+.fov-value-hero { margin: 2px 0 4px; }
+.fov-current { font-size: 1.4rem !important; }
