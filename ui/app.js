@@ -239,15 +239,23 @@ async function updateDetectBadge() {
   let res;
   try { res = await call('detect_tier_cmd', { citadel: cit }); } catch (e) { return; }
   const badge = document.getElementById('detect-badge');
+  const apDot = document.getElementById('active-dot');
+  const apLabel = document.getElementById('active-profile-label');
   if (res === 'T1' || res === 'T2' || res === 'T3') {
     badge.textContent = `${res} ` + t('currentTier');
     badge.style.color = 'var(--deadlock-orange)';
+    if (apDot) apDot.style.background = 'var(--deadlock-orange)';
+    if (apLabel) apLabel.textContent = 'ACTIVE · ' + res;
   } else if (res === 'MISSING') {
     badge.textContent = t('currentMissing');
     badge.style.color = 'var(--text-muted)';
+    if (apDot) apDot.style.background = 'var(--text-muted)';
+    if (apLabel) apLabel.textContent = t('currentMissing');
   } else {
     badge.textContent = t('currentUnknown');
     badge.style.color = 'var(--deadlock-cyan)';
+    if (apDot) apDot.style.background = 'var(--deadlock-cyan)';
+    if (apLabel) apLabel.textContent = t('currentUnknown');
   }
 }
 
@@ -457,10 +465,12 @@ function showModal(title, body, actions) {
 function setFov(v) {
   const slider = document.getElementById('fov-slider');
   const number = document.getElementById('fov-number');
+  const current = document.getElementById('fov-current');
   const snapped = Math.min(120, Math.max(70, Math.round((v - 70) / 5) * 5 + 70));
   state.fov = snapped;
   if (slider) slider.value = snapped;
   if (number) number.value = snapped;
+  if (current) current.textContent = snapped + '°';
 }
 
 // ---------- valve game servers ping ----------

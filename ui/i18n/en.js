@@ -155,4 +155,8 @@ window.I18N_EN = {
   perfMaxFps: "MAX FPS",
   perfPotato: "POTATO",
   hudTitle: "HUD",
+  graphicsProfile: "GRAPHICS PROFILE",
+  secDisplay: "DISPLAY",
+  secHud: "HUD",
+  secConfig: "CONFIGURATION",
 };

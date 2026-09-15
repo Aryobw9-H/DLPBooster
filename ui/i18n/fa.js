@@ -150,4 +150,8 @@ window.I18N_FA = {
   perfMaxFps: "MAX FPS",
   perfPotato: "POTATO",
   hudTitle: "HUD",
+  graphicsProfile: "پروفایل گرافیک",
+  secDisplay: "نمایش",
+  secHud: "رابط کاربری",
+  secConfig: "وضعیت",
 };
