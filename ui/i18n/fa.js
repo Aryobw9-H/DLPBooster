@@ -154,5 +154,4 @@ window.I18N_FA = {
   secDisplay: "نمایش",
   secHud: "رابط کاربری",
   secConfig: "وضعیت",
-  profileLegend: "یکی را انتخاب کن و سپس اعمال کن",
 };

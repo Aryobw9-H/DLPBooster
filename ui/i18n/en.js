@@ -159,5 +159,4 @@ window.I18N_EN = {
   secDisplay: "DISPLAY",
   secHud: "HUD",
   secConfig: "CONFIGURATION",
-  profileLegend: "pick one, then APPLY",
 };
