@@ -2731,7 +2731,16 @@ body.lang-fa .step-log { text-align: left; } /* log stays LTR monospace */
 
 /* FOV + HUD row: HUD defines the height, FOV shrinks to match */
 .settings-duo { display: grid; grid-template-columns: 1.6fr 1fr; gap: 10px; align-items: stretch; }
-.setting-box { padding: 10px 12px; gap: 6px; }
+.setting-box {
+  background: rgba(11, 19, 33, 0.7);
+  border: 1px solid rgba(59, 130, 246, 0.16);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-sizing: border-box;
+}
 
 /* FOV internals compacted: smaller readout + tighter slider block so the BOX is short */
 .fov-value-hero { margin: 0; }
