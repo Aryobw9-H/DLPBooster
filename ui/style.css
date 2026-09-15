@@ -2746,3 +2746,49 @@ body.lang-fa .tier-badge {
   direction: ltr;
 }
 body.lang-fa .step-log { text-align: left; } /* log stays LTR monospace */
+
+
+/* ===================== B2: unambiguous selection state ===================== */
+.tier-card.selected {
+  background: rgba(249, 115, 22, 0.14) !important;
+  box-shadow: 0 0 0 1.5px var(--deadlock-orange), 0 0 24px rgba(249, 115, 22, 0.28);
+  transform: translateY(-1px);
+}
+.tier-card.selected::after {
+  content: '00c'; /* fa check */
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  position: absolute;
+  top: 6px;
+  inset-inline-end: 8px;
+  font-size: 0.62rem;
+  color: var(--deadlock-orange);
+}
+.tier-card { position: relative; }
+
+/* ===================== B3: bar meaning tooltip via title attrs (in HTML) ===================== */
+
+
+/* ===================== REVIEW BATCH 2: selection, bars, legend, focus, status ===================== */
+.section-label-hint {
+  font-size: 0.54rem; letter-spacing: 0.5px;
+  color: var(--text-muted, #64748b);
+  text-transform: none;
+}
+.tier-bar-val {
+  font-family: 'Rajdhani', monospace;
+  font-size: 0.56rem; font-weight: 700;
+  color: var(--text-secondary, #94a3b8);
+  min-width: 34px;
+  text-align: end;
+}
+.tier-bar-row .stat-bar { flex: 1; }
+
+/* keyboard focus visibility (accessibility) */
+.tier-card:focus-visible,
+.pro-card:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--deadlock-cyan, #38bdf8);
+  outline-offset: 2px;
+}
+.tier-card, .pro-card { cursor: pointer; }

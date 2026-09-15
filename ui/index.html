@@ -118,7 +118,7 @@
             <i class="fa-solid fa-desktop" id="section-icon" style="font-size:13px;color:var(--deadlock-orange)"></i>
             <span id="section-title">تنظیمات گرافیکی</span>
           </div>
-          <span class="detect-badge" id="detect-badge" style="display:none"></span>
+          <span class="detect-badge" id="detect-badge" style="display:none"></span> <!-- consolidated into #active-profile -->
         </div>
 
         <!-- GRAPHIC SETTING: 4 Tiers + Long FOV Box -->
@@ -126,7 +126,8 @@
           <div class="graphic-layout">
             
             <!-- 4) section header: presets are the hero -->
-            <div class="section-label"><span data-i18n="graphicsProfile">GRAPHICS PROFILE</span><span class="section-label-line"></span></div>
+            <div class="section-label"><span data-i18n="graphicsProfile">GRAPHICS PROFILE</span>
+              <span class="section-label-hint" data-i18n="profileLegend">T1 = quality · T3 = FPS · POTATO = minimum — pick one, then APPLY</span><span class="section-label-line"></span></div>
             <!-- 4 Graphic Presets Row (High, Medium, Low, Potato) -->
             <div class="tiers-row">
               <div class="tier-card selected" data-mode="T1" onclick="selectPreset('T1')">
@@ -136,9 +137,9 @@
                 </div>
                 <div class="tier-sub"><span class="tier-sub-en">QUALITY</span><span class="tier-sub-desc">Maximum fidelity</span></div>
                 <div class="tier-bars">
-                  <div class="tier-bar-row"><span>FPS</span><div class="stat-bar"><div class="stat-fill" style="width: 25%"></div></div></div>
-                  <div class="tier-bar-row"><span>QUALITY</span><div class="stat-bar"><div class="stat-fill" style="width: 100%"></div></div></div>
-                  <div class="tier-bar-row"><span>GPU</span><div class="stat-bar"><div class="stat-fill" style="width: 95%"></div></div></div>
+                  <div class="tier-bar-row" title="Relative FPS gain vs T1 baseline"><span>FPS</span><span class="tier-bar-val">+0%</span><div class="stat-bar"><div class="stat-fill" style="width: 25%"></div></div></div>
+                  <div class="tier-bar-row" title="Relative visual quality vs T1 baseline"><span>QUALITY</span><span class="tier-bar-val">MAX</span><div class="stat-bar"><div class="stat-fill" style="width: 100%"></div></div></div>
+                  <div class="tier-bar-row" title="Relative GPU load vs T1 baseline"><span>GPU</span><span class="tier-bar-val">100%</span><div class="stat-bar"><div class="stat-fill" style="width: 95%"></div></div></div>
                 </div>
                 <div class="tier-name" data-i18n="tierHigh" style="text-align: center; margin-top: auto; padding-top: 6px;">گرافیک بالا</div>
               </div>
@@ -150,9 +151,9 @@
                 </div>
                 <div class="tier-sub"><span class="tier-sub-en">BALANCED</span><span class="tier-sub-desc">Quality + performance</span></div>
                 <div class="tier-bars">
-                  <div class="tier-bar-row"><span>FPS</span><div class="stat-bar"><div class="stat-fill" style="width: 65%"></div></div></div>
-                  <div class="tier-bar-row"><span>QUALITY</span><div class="stat-bar"><div class="stat-fill" style="width: 70%"></div></div></div>
-                  <div class="tier-bar-row"><span>GPU</span><div class="stat-bar"><div class="stat-fill" style="width: 60%"></div></div></div>
+                  <div class="tier-bar-row" title="Relative FPS gain vs T1 baseline"><span>FPS</span><span class="tier-bar-val">+30%</span><div class="stat-bar"><div class="stat-fill" style="width: 65%"></div></div></div>
+                  <div class="tier-bar-row" title="Relative visual quality vs T1 baseline"><span>QUALITY</span><span class="tier-bar-val">HIGH</span><div class="stat-bar"><div class="stat-fill" style="width: 70%"></div></div></div>
+                  <div class="tier-bar-row" title="Relative GPU load vs T1 baseline"><span>GPU</span><span class="tier-bar-val">75%</span><div class="stat-bar"><div class="stat-fill" style="width: 60%"></div></div></div>
                 </div>
                 <div class="tier-name" data-i18n="tierMed" style="text-align: center; margin-top: auto; padding-top: 6px;">گرافیک متوسط</div>
               </div>
@@ -164,9 +165,9 @@
                 </div>
                 <div class="tier-sub"><span class="tier-sub-en">FPS BOOST</span><span class="tier-sub-desc">Performance priority</span></div>
                 <div class="tier-bars">
-                  <div class="tier-bar-row"><span>FPS</span><div class="stat-bar"><div class="stat-fill" style="width: 90%"></div></div></div>
-                  <div class="tier-bar-row"><span>QUALITY</span><div class="stat-bar"><div class="stat-fill" style="width: 35%"></div></div></div>
-                  <div class="tier-bar-row"><span>GPU</span><div class="stat-bar"><div class="stat-fill" style="width: 30%"></div></div></div>
+                  <div class="tier-bar-row" title="Relative FPS gain vs T1 baseline"><span>FPS</span><span class="tier-bar-val">+80%</span><div class="stat-bar"><div class="stat-fill" style="width: 90%"></div></div></div>
+                  <div class="tier-bar-row" title="Relative visual quality vs T1 baseline"><span>QUALITY</span><span class="tier-bar-val">MED</span><div class="stat-bar"><div class="stat-fill" style="width: 35%"></div></div></div>
+                  <div class="tier-bar-row" title="Relative GPU load vs T1 baseline"><span>GPU</span><span class="tier-bar-val">50%</span><div class="stat-bar"><div class="stat-fill" style="width: 30%"></div></div></div>
                 </div>
                 <div class="tier-name" data-i18n="tierLow" style="text-align: center; margin-top: auto; padding-top: 6px;">گرافیگ پایین</div>
               </div>
@@ -178,9 +179,9 @@
                 </div>
                 <div class="tier-sub"><span class="tier-sub-en">POTATO MODE</span><span class="tier-sub-desc">Minimum graphics</span></div>
                 <div class="tier-bars">
-                  <div class="tier-bar-row"><span>FPS</span><div class="stat-bar"><div class="stat-fill" style="width: 100%"></div></div></div>
-                  <div class="tier-bar-row"><span>QUALITY</span><div class="stat-bar"><div class="stat-fill" style="width: 15%"></div></div></div>
-                  <div class="tier-bar-row"><span>GPU</span><div class="stat-bar"><div class="stat-fill" style="width: 10%"></div></div></div>
+                  <div class="tier-bar-row" title="Relative FPS gain vs T1 baseline"><span>FPS</span><span class="tier-bar-val">+150%</span><div class="stat-bar"><div class="stat-fill" style="width: 100%"></div></div></div>
+                  <div class="tier-bar-row" title="Relative visual quality vs T1 baseline"><span>QUALITY</span><span class="tier-bar-val">LOW</span><div class="stat-bar"><div class="stat-fill" style="width: 15%"></div></div></div>
+                  <div class="tier-bar-row" title="Relative GPU load vs T1 baseline"><span>GPU</span><span class="tier-bar-val">25%</span><div class="stat-bar"><div class="stat-fill" style="width: 10%"></div></div></div>
                 </div>
                 <div class="tier-name" data-i18n="tierPotato" style="text-align: center; margin-top: auto; padding-top: 6px;">گرافیک ذغالی</div>
               </div>
@@ -196,7 +197,7 @@
                     <span class="fov-box-title" data-i18n="fovTitle">FIELD OF VIEW</span>
                   </div>
                   <div class="fov-box-header-actions">
-                    <button class="btn-reset btn-sm" id="btn-fov-reset" onclick="setFov(90)">
+                    <button class="btn-reset btn-sm" id="btn-fov-reset" onclick="setFov(90)" title="Reset to game default (90°)">
                       <i class="fa-solid fa-rotate-left"></i> <span data-i18n="btnFovReset">RESET</span>
                     </button>
                   </div>
