@@ -2543,22 +2543,6 @@ button:active,
 }
 
 
-/* ===================== CAMERA | HUD side-by-side boxes ===================== */
-.settings-duo {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  align-items: stretch;
-}
-.setting-box {
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 6px;
-  background: rgba(10, 15, 24, 0.4);
-  padding: 10px 14px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
 .setting-box .fov-box-header { margin: 0; }
 .setting-box .fov-slider-bar { margin: 0; flex: 1; }
 .setting-box .hud-switch-wrap { flex: 1; margin: 0; align-content: center; }
@@ -2578,9 +2562,6 @@ button:active,
 .content-viewport { display: flex; flex-direction: column; }
 
 
-/* duo boxes demoted: compact secondary row */
-.settings-duo { gap: 8px; margin-top: 8px; }
-.setting-box { padding: 7px 12px 9px; gap: 5px; }
 .setting-box .fov-box-title { font-size: 0.72rem; }
 .setting-box .fov-slider-bar { margin: 0; }
 .fov-range-input { height: 4px; }
@@ -2679,26 +2660,7 @@ button:active,
 .setting-box .fov-box-title-wrap i,
 .section-label i { font-size: 12px; width: 14px; text-align: center; }
 
-/* HUD and FOV boxes side-by-side */
-.settings-duo {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  width: 100%;
-  margin-top: 4px;
-}
 
-.setting-box {
-  background: rgba(11, 19, 33, 0.7);
-  border: 1px solid rgba(59, 130, 246, 0.16);
-  border-radius: 8px;
-  padding: 10px 14px;
-  height: auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  box-sizing: border-box;
-}
 
 /* Stat bars for tier cards */
 .stat-bar {
@@ -2748,27 +2710,31 @@ body.lang-fa .step-log { text-align: left; } /* log stays LTR monospace */
 .dlp-icon-badge { width: 12px; height: 12px; vertical-align: -2px; margin-inline-end: 3px; }
 .dlp-icon-play { width: 12px; height: 12px; display: block; }
 
-/* tier cards: shorter */
-.tiers-row { height: auto !important; min-height: 0 !important; }
-.tier-card { padding: 8px 10px; gap: 2px; justify-content: flex-start; }
 
 
-/* setting boxes: shorter */
-.setting-box { padding: 6px 12px 8px; gap: 4px; }
 .fov-value-hero { margin: 0 0 2px; }
 .fov-current { font-size: 1.25rem !important; }
 
-/* HUD box: much smaller — it's one optional toggle */
-.settings-duo { grid-template-columns: 1.6fr 1fr; align-items: start; }
 .setting-box:last-child { padding: 6px 12px; }
 .setting-box:last-child .hud-switch-wrap { margin: 0; }
 .setting-box:last-child .neon-checkbox { --size: 22px; }
 .setting-box:last-child .hud-switch-label { font-size: 0.78rem; }
 
 
-/* ===================== BOX SIZING: taller preset cards, FOV = HUD equal height ===================== */
-.settings-duo { align-items: stretch; }
-.setting-box { padding: 12px 14px; gap: 8px; }
 .setting-box:last-child { padding: 12px 14px; }
 .fov-value-hero { margin: 2px 0 4px; }
 .fov-current { font-size: 1.4rem !important; }
+
+/* ===================== FINAL BOX SIZING (single source of truth) ===================== */
+/* tier cards: taller than 8px-padding version */
+.tier-card { padding: 14px 12px; gap: 4px; }
+
+/* FOV + HUD row: HUD defines the height, FOV shrinks to match */
+.settings-duo { display: grid; grid-template-columns: 1.6fr 1fr; gap: 10px; align-items: stretch; }
+.setting-box { padding: 10px 12px; gap: 6px; }
+
+/* FOV internals compacted: smaller readout + tighter slider block so the BOX is short */
+.fov-value-hero { margin: 0; }
+.fov-current { font-size: 1.1rem !important; }
+.fov-slider-bar { margin: 0; }
+.fov-scale-labels { margin-top: 2px; }
