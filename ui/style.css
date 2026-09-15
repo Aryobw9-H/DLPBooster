@@ -1043,9 +1043,7 @@ button:active,
 
 .tier-card {
   min-width: 0;
-  height: 145px;
-  min-height: 145px;
-  max-height: 145px;
+  height: auto;
   background: rgba(11, 19, 33, 0.7);
   border: 1px solid rgba(59, 130, 246, 0.16);
   border-radius: 8px;
@@ -2695,9 +2693,7 @@ button:active,
   border: 1px solid rgba(59, 130, 246, 0.16);
   border-radius: 8px;
   padding: 10px 14px;
-  height: 145px;
-  min-height: 145px;
-  max-height: 145px;
+  height: auto;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -2754,8 +2750,8 @@ body.lang-fa .step-log { text-align: left; } /* log stays LTR monospace */
 
 /* tier cards: shorter */
 .tiers-row { height: auto !important; min-height: 0 !important; }
-.tier-card { padding: 6px 10px 8px; gap: 2px; min-height: 0; }
-.tier-name { margin-top: 0 !important; padding-top: 0 !important; }
+.tier-card { padding: 8px 10px; gap: 2px; justify-content: flex-start; }
+
 
 /* setting boxes: shorter */
 .setting-box { padding: 6px 12px 8px; gap: 4px; }
