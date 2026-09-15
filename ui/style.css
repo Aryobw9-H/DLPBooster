@@ -2746,3 +2746,25 @@ body.lang-fa .tier-badge {
   direction: ltr;
 }
 body.lang-fa .step-log { text-align: left; } /* log stays LTR monospace */
+
+
+/* ===================== DEADLOCK ICONS (badge/launch only) + COMPACT ROWS ===================== */
+.dlp-icon-badge { width: 12px; height: 12px; vertical-align: -2px; margin-inline-end: 3px; }
+.dlp-icon-play { width: 12px; height: 12px; display: block; }
+
+/* tier cards: shorter */
+.tiers-row { height: auto !important; min-height: 0 !important; }
+.tier-card { padding: 6px 10px 8px; gap: 2px; min-height: 0; }
+.tier-name { margin-top: 0 !important; padding-top: 0 !important; }
+
+/* setting boxes: shorter */
+.setting-box { padding: 6px 12px 8px; gap: 4px; }
+.fov-value-hero { margin: 0 0 2px; }
+.fov-current { font-size: 1.25rem !important; }
+
+/* HUD box: much smaller — it's one optional toggle */
+.settings-duo { grid-template-columns: 1.6fr 1fr; align-items: start; }
+.setting-box:last-child { padding: 6px 12px; }
+.setting-box:last-child .hud-switch-wrap { margin: 0; }
+.setting-box:last-child .neon-checkbox { --size: 22px; }
+.setting-box:last-child .hud-switch-label { font-size: 0.78rem; }
