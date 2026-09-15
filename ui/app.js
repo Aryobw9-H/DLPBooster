@@ -56,9 +56,13 @@ function t(key) {
 
 function applyLang() {
   document.documentElement.lang = state.lang;
-  document.documentElement.dir = 'ltr'; // Strictly pinned LTR: layout/buttons never jump
+  document.documentElement.dir = 'ltr'; // layout stays LTR — only text content flips RTL
+  // FA: all text-bearing elements get rtl so Persian reads correctly; EN back to ltr.
+  // Placement/geometry untouched (buttons stay where they are).
+  document.body.classList.toggle('lang-fa', state.lang === 'fa');
   document.querySelectorAll('[data-i18n]').forEach((el) => {
     el.textContent = t(el.dataset.i18n);
+    el.classList.toggle('i18n-rtl', state.lang === 'fa');
   });
   const u = document.getElementById('unlock-input');
   const p = document.getElementById('path-input');
@@ -241,22 +245,22 @@ async function updateDetectBadge() {
   const badge = document.getElementById('detect-badge');
   const apDot = document.getElementById('active-dot');
   const apLabel = document.getElementById('active-profile-label');
-  if (res === 'T1' || res === 'T2' || res === 'T3') {
-    badge.textContent = `${res} ` + t('currentTier');
-    badge.style.color = 'var(--deadlock-orange)';
-    if (apDot) apDot.style.background = 'var(--deadlock-orange)';
-    if (apLabel) apLabel.textContent = 'ACTIVE · ' + res;
-  } else if (res === 'MISSING') {
-    badge.textContent = t('currentMissing');
-    badge.style.color = 'var(--text-muted)';
-    if (apDot) apDot.style.background = 'var(--text-muted)';
-    if (apLabel) apLabel.textContent = t('currentMissing');
-  } else {
-    badge.textContent = t('currentUnknown');
-    badge.style.color = 'var(--deadlock-cyan)';
-    if (apDot) apDot.style.background = 'var(--deadlock-cyan)';
-    if (apLabel) apLabel.textContent = t('currentUnknown');
-  }
+    if (res === 'T1' || res === 'T2' || res === 'T3') {
+      badge.textContent = `${res} ` + t('currentTier');
+      badge.style.color = 'var(--deadlock-orange)';
+      if (apDot) { apDot.style.background = 'var(--deadlock-orange)'; apDot.style.color = 'var(--deadlock-orange)'; }
+      if (apLabel) apLabel.textContent = 'ACTIVE · ' + res;
+    } else if (res === 'MISSING') {
+      badge.textContent = t('currentMissing');
+      badge.style.color = 'var(--text-muted)';
+      if (apDot) { apDot.style.background = 'var(--text-muted)'; apDot.style.color = 'var(--text-muted)'; }
+      if (apLabel) apLabel.textContent = t('currentMissing');
+    } else {
+      badge.textContent = t('currentUnknown');
+      badge.style.color = 'var(--deadlock-cyan)';
+      if (apDot) { apDot.style.background = 'var(--deadlock-cyan)'; apDot.style.color = 'var(--deadlock-cyan)'; }
+      if (apLabel) apLabel.textContent = t('currentUnknown');
+    }
 }
 
 // ---------- install flow ----------

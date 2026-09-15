@@ -173,6 +173,7 @@
       align-items: center;
       justify-content: center;
       transform-origin: center center;
+      transform: scale(0.8);
       flex-shrink: 0;
       box-sizing: border-box;
       padding: 0 10px;
@@ -191,7 +192,7 @@
     }
 
     .bg-trooper-left {
-      left: -200px;
+      left: -280px;
       top: -10px;
       width: 340px;
       opacity: 0.85;
@@ -199,7 +200,7 @@
     }
 
     .bg-trooper-right {
-      right: -200px;
+      right: -280px;
       top: -10px;
       width: 340px;
       opacity: 0.85;
@@ -399,20 +400,20 @@
       color: var(--text-secondary);
     }
 
-    /* Content Viewport / Panels - EXACT FIXED DIMENSIONS IN ALL 3 VIEWS */
+    /* Content Viewport / Panels - EXACT FIXED DIMENSIONS IN ALL 3 VIEWS (NO LAYOUT SHIFTS / NO CUT-OFFS) */
     .content-viewport {
       position: relative;
       z-index: 1;
       width: 100%;
       max-width: 900px;
-      height: 350px;
-      min-height: 350px;
-      max-height: 350px;
+      height: 440px;
+      min-height: 440px;
+      max-height: 440px;
       background: rgba(14, 23, 38, 0.6);
       border: 1px solid rgba(59, 130, 246, 0.15);
       backdrop-filter: blur(12px);
       border-radius: 10px;
-      padding: 10px 14px 8px 14px;
+      padding: 8px 14px 8px 14px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -1035,24 +1036,24 @@ button:active,
   gap: 8px;
   width: 100%;
   height: auto;
-  min-height: 108px;
+  min-height: 68px;
   box-sizing: border-box;
   flex-shrink: 0;
 }
 
 .tier-card {
   min-width: 0;
-  height: 68px;
-  min-height: 68px;
-  max-height: 68px;
+  height: 145px;
+  min-height: 145px;
+  max-height: 145px;
   background: rgba(11, 19, 33, 0.7);
   border: 1px solid rgba(59, 130, 246, 0.16);
   border-radius: 8px;
-  padding: 6px 10px;
+  padding: 8px 10px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   cursor: pointer;
   box-sizing: border-box;
   transition: all 0.2s ease;
@@ -1077,6 +1078,51 @@ button:active,
   justify-content: space-between;
   align-items: center;
   width: 100%;
+}
+
+.tier-sub {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.tier-sub-en {
+  font-family: 'Rajdhani', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: 1px;
+}
+
+.tier-sub-desc {
+  font-family: 'Rajdhani', monospace;
+  font-size: 0.62rem;
+  color: var(--text-muted);
+}
+
+.tier-bars {
+  margin-top: 8px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tier-bar-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'Rajdhani', monospace;
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.tier-bar-stars {
+  color: var(--deadlock-orange);
+  font-size: 0.55rem;
+  letter-spacing: 1.5px;
 }
 
 .tier-badge {
@@ -2520,8 +2566,14 @@ button:active,
 .setting-box .hud-switch-wrap { flex: 1; margin: 0; align-content: center; }
 
 
-/* ===================== NO JUMP: panels = classic fixed size, scroll inside ===================== */
-#panel-graphic, #panel-latency, #panel-advanced {
+/* ===================== NO JUMP: panels = classic fixed size, scroll inside where needed ===================== */
+#panel-graphic {
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+#panel-latency, #panel-advanced {
   height: 100%;
   overflow-y: auto;
 }
@@ -2628,3 +2680,69 @@ button:active,
 /* 13) icon consistency: all inline FA icons same optical size/weight */
 .setting-box .fov-box-title-wrap i,
 .section-label i { font-size: 12px; width: 14px; text-align: center; }
+
+/* HUD and FOV boxes side-by-side */
+.settings-duo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.setting-box {
+  background: rgba(11, 19, 33, 0.7);
+  border: 1px solid rgba(59, 130, 246, 0.16);
+  border-radius: 8px;
+  padding: 10px 14px;
+  height: 145px;
+  min-height: 145px;
+  max-height: 145px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+/* Stat bars for tier cards */
+.stat-bar {
+  width: 45%;
+  height: 5px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+  margin-top: 3px;
+}
+.stat-fill {
+  height: 100%;
+  background: var(--deadlock-orange);
+  border-radius: 3px;
+  transition: width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.tier-card:hover .stat-fill {
+  box-shadow: 0 0 6px var(--deadlock-orange);
+}
+
+
+/* ===================== FA RTL TEXTS (text direction only — placement untouched) ===================== */
+body.lang-fa .i18n-rtl,
+body.lang-fa .adv-card-desc,
+body.lang-fa .option-detail,
+body.lang-fa .modal-body,
+body.lang-fa .step-log,
+body.lang-fa .hud-switch-label,
+body.lang-fa .backup-row {
+  direction: rtl;
+  text-align: right;
+}
+/* but keep numeric/path content LTR even in FA */
+body.lang-fa .path-input,
+body.lang-fa .fov-num-input,
+body.lang-fa .backup-name,
+body.lang-fa .step-log,
+body.lang-fa .tier-name,
+body.lang-fa .tier-badge {
+  direction: ltr;
+}
+body.lang-fa .step-log { text-align: left; } /* log stays LTR monospace */
