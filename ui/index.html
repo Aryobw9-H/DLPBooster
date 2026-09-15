@@ -29,7 +29,7 @@
     <div class="titlebar-drag-spacer" data-tauri-drag-region style="flex:1; height:100%;"></div>
     <div class="window-controls" data-tauri-drag-region="false">
       <button class="btn-play" id="btn-launch" title="اجرای بازی ددلاک / Launch Game">
-        <span class="play-chip"><i class="fa-solid fa-play"></i></span>
+        <span class="play-chip"><img src="assets/icons_norm/logo_mark.png" class="dlp-icon-play" alt="" /></span>
         <span data-i18n="launch">اجرای بازی</span>
       </button>
       <button class="lang-pill-btn" id="btn-lang-toggle" data-tauri-drag-region="false" onclick="toggleLang()" title="تغییر زبان / Switch Language">
@@ -90,21 +90,21 @@
 
         <div class="pro-card active" id="card-graphic">
           <div class="card-icon-wrap">
-            <i class="fa-solid fa-desktop card-icon"></i>
+            <img src="assets/icons_norm/shop.png" class="dlp-icon" alt="" />
           </div>
           <div class="card-title" data-i18n="cardGraphic">Graphic Settings</div>
         </div>
 
         <div class="pro-card" id="card-latency">
           <div class="card-icon-wrap">
-            <i class="fa-solid fa-bolt card-icon"></i>
+            <img src="assets/icons_norm/teleport.png" class="dlp-icon" alt="" />
           </div>
           <div class="card-title" data-i18n="cardLatency">Latency</div>
         </div>
 
         <div class="pro-card" id="card-advanced">
           <div class="card-icon-wrap">
-            <i class="fa-solid fa-sliders card-icon"></i>
+            <img src="assets/icons_norm/leap.png" class="dlp-icon" alt="" />
           </div>
           <div class="card-title" data-i18n="cardAdvanced">Advanced</div>
         </div>
@@ -115,7 +115,7 @@
       <section class="content-viewport">
         <div class="content-header">
           <div class="content-header-title">
-            <i class="fa-solid fa-desktop" id="section-icon" style="font-size:13px;color:var(--deadlock-orange)"></i>
+            <img src="assets/icons_norm/shop.png" id="section-icon" class="dlp-icon-sm" alt="" />
             <span id="section-title">تنظیمات گرافیکی</span>
           </div>
           <span class="detect-badge" id="detect-badge" style="display:none"></span>
@@ -132,7 +132,7 @@
               <div class="tier-card selected" data-mode="T1" onclick="selectPreset('T1')">
                 <span class="border-beam"><span class="beam"></span></span>
                 <div class="tier-card-header">
-                  <span class="tier-badge t1"><i class="fa-solid fa-gem"></i> T1</span>
+                  <span class="tier-badge t1"><img src="assets/icons_norm/melee.png" class="dlp-icon-badge" alt="" /> T1</span>
                 </div>
                 <div class="tier-name" data-i18n="tierHigh" style="text-align: center; margin-top: auto; padding-top: 6px;">گرافیک بالا</div>
               </div>
@@ -140,7 +140,7 @@
               <div class="tier-card" data-mode="T2" onclick="selectPreset('T2')">
                 <span class="border-beam"><span class="beam"></span></span>
                 <div class="tier-card-header">
-                  <span class="tier-badge t2"><i class="fa-solid fa-scale-balanced"></i> T2</span>
+                  <span class="tier-badge t2"><img src="assets/icons_norm/fortitude_stat.png" class="dlp-icon-badge" alt="" /> T2</span>
                 </div>
                 <div class="tier-name" data-i18n="tierMed" style="text-align: center; margin-top: auto; padding-top: 6px;">گرافیک متوسط</div>
               </div>
@@ -148,7 +148,7 @@
               <div class="tier-card" data-mode="T3" onclick="selectPreset('T3')">
                 <span class="border-beam"><span class="beam"></span></span>
                 <div class="tier-card-header">
-                  <span class="tier-badge t3"><i class="fa-solid fa-bolt"></i> T3</span>
+                  <span class="tier-badge t3"><img src="assets/icons_norm/flare.png" class="dlp-icon-badge" alt="" /> T3</span>
                 </div>
                 <div class="tier-name" data-i18n="tierLow" style="text-align: center; margin-top: auto; padding-top: 6px;">گرافیگ پایین</div>
               </div>
@@ -156,7 +156,7 @@
               <div class="tier-card" data-mode="POTATO" onclick="selectPreset('POTATO')">
                 <span class="border-beam"><span class="beam"></span></span>
                 <div class="tier-card-header">
-                  <span class="tier-badge potato"><i class="fa-solid fa-seedling"></i> POTATO</span>
+                  <span class="tier-badge potato"><img src="assets/icons_norm/gold.png" class="dlp-icon-badge" alt="" /> POTATO</span>
                 </div>
                 <div class="tier-name" data-i18n="tierPotato" style="text-align: center; margin-top: auto; padding-top: 6px;">گرافیک ذغالی</div>
               </div>
@@ -168,7 +168,7 @@
               <div class="setting-box">
                 <div class="fov-box-header">
                   <div class="fov-box-title-wrap">
-                    <i class="fa-solid fa-eye" style="font-size:14px"></i>
+                    <img src="assets/icons_norm/crosshair.png" class="dlp-icon-box" alt="" />
                     <span class="fov-box-title" data-i18n="fovTitle">FIELD OF VIEW</span>
                   </div>
                   <div class="fov-box-header-actions">
@@ -197,7 +197,7 @@
               <div class="setting-box" style="justify-content: space-between;">
                 <div class="fov-box-header">
                   <div class="fov-box-title-wrap">
-                    <i class="fa-solid fa-heart-pulse" style="font-size:14px"></i>
+                    <img src="assets/icons_norm/healthbar_fill.png" class="dlp-icon-box" alt="" />
                     <span class="fov-box-title" data-i18n="hudTitle">HUD CONFIGURATION</span>
                   </div>
                 </div>

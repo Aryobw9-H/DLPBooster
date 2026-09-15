@@ -2746,3 +2746,12 @@ body.lang-fa .tier-badge {
   direction: ltr;
 }
 body.lang-fa .step-log { text-align: left; } /* log stays LTR monospace */
+
+
+/* ===================== REAL DEADLOCK ICONS (game-extracted PNGs) ===================== */
+.dlp-icon { width: 34px; height: 34px; filter: drop-shadow(0 0 8px rgba(249,115,22,.35)); }
+.dlp-icon-sm { width: 16px; height: 16px; }
+.dlp-icon-badge { width: 13px; height: 13px; vertical-align: -2px; margin-inline-end: 3px; }
+.dlp-icon-box { width: 15px; height: 15px; }
+.dlp-icon-play { width: 12px; height: 12px; display: block; }
+.card-icon-wrap:has(.dlp-icon) { display: flex; align-items: center; justify-content: center; }
