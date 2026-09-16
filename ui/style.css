@@ -1350,7 +1350,7 @@ button:active,
 
 .ping-view-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end; /* title removed — button alone at top-right */
   align-items: center;
   height: 32px;
   min-height: 32px;
@@ -2747,3 +2747,18 @@ body.lang-fa .step-log { text-align: left; } /* log stays LTR monospace */
 .fov-current { font-size: 1.1rem !important; }
 .fov-slider-bar { margin: 0; }
 .fov-scale-labels { margin-top: 2px; }
+
+/* ===================== FA FONT ENFORCEMENT — every Farsi-capable text uses Vazirmatn ===================== */
+body.lang-fa .step-log,
+body.lang-fa .backup-name,
+body.lang-fa .net-footer,
+body.lang-fa .active-profile-label,
+body.lang-fa .last-test,
+body.lang-fa .tier-badge,
+body.lang-fa .modal-title,
+body.lang-fa .adv-card-title,
+body.lang-fa .ping-view-title,
+body.lang-fa .hud-switch-label {
+  font-family: 'Vazirmatn', sans-serif;
+}
+/* digits inside FA text stay readable (Vazirmatn has latin digits) */

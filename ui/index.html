@@ -186,9 +186,9 @@
                   <span class="fov-bound">120°</span>
                 </div>
                 <div class="fov-scale-labels" style="display:flex; justify-content:space-between; font-size:0.6rem; color:var(--text-muted); margin-top:4px; font-weight:700;">
-                  <span>NARROW</span>
-                  <span class="fov-default-tick" id="fov-default-tick">DEFAULT · 90°</span>
-                  <span>WIDE</span>
+                  <span data-i18n="fovNarrow">NARROW</span>
+                  <span class="fov-default-tick" id="fov-default-tick" data-i18n="fovDefaultTick">DEFAULT · 90°</span>
+                  <span data-i18n="fovWide">WIDE</span>
                 </div>
                 <input type="hidden" id="fov-number" value="90" />
               </div>
@@ -204,7 +204,7 @@
                 <label class="hud-switch-wrap" title="New Health bars" style="display:flex; justify-content:space-between; align-items:center; width:100%; margin:auto 0; cursor:pointer;">
                   <div style="display:flex; flex-direction:column; gap:4px;">
                     <span class="hud-switch-label" data-i18n="unitStatus" style="font-weight:700; font-size:0.85rem; color:var(--text-main);">New Health Bars</span>
-                    <span style="font-size:0.65rem; color:var(--text-muted);">Show updated health bar visuals</span>
+                    <span data-i18n="hudSwitchDesc" style="font-size:0.65rem; color:var(--text-muted);">Show updated health bar visuals</span>
                   </div>
                   <label class="neon-checkbox" style="margin-left:auto;">
                     <input type="checkbox" id="sw-unit-status">
@@ -235,17 +235,10 @@
         <div class="panel" id="panel-latency" style="display:none">
           <div class="valve-ping-view" style="flex:1;min-height:0">
             <div class="ping-view-header">
-              <div class="ping-header-left">
-                <span class="net-label">NETWORK</span>
-                <span class="ping-view-title" data-i18n="valvePingTitle">DEADLOCK RELAY NETWORK</span>
-              </div>
-              <div class="ping-header-right">
-                <span class="last-test" id="last-test-tag" style="display:none"></span>
-                <button class="btn-apply btn-sm" id="btn-refresh-ping" onclick="refreshValvePings()">
-                  <i class="fa-solid fa-wave-square refresh-icon"></i>
-                  <span data-i18n="btnTestRelays">TEST ALL RELAYS</span>
-                </button>
-              </div>
+              <button class="btn-apply btn-sm" id="btn-refresh-ping" onclick="refreshValvePings()">
+                <i class="fa-solid fa-wave-square refresh-icon"></i>
+                <span data-i18n="btnTestRelays">TEST ALL RELAYS</span>
+              </button>
             </div>
             <!-- BEST ROUTE + relays + footer: one scrollable page -->
             <div class="latency-scroll">
@@ -317,7 +310,7 @@
           <!-- ACTIVE profile indicator -->
           <div class="active-profile" id="active-profile" style="display:flex; align-items:center; gap:8px; font-family:'Rajdhani', monospace; font-size:0.8rem; font-weight:700; color:var(--text-main); letter-spacing:1px;">
             <span class="active-dot" id="active-dot" style="width:8px; height:8px; border-radius:50%; background:var(--text-muted); box-shadow:0 0 8px currentColor;"></span>
-            <span class="active-label" id="active-profile-label">ACTIVE · —</span>
+            <span class="active-label" id="active-profile-label" data-i18n="activeProfile">ACTIVE · —</span>
           </div>
           <div id="step-log" class="step-log" style="flex:1; margin:0 15px; font-size:0.75rem; color:var(--text-muted); text-align:right;"></div>
           <div style="display:flex;gap:12px;align-items:center">

@@ -126,7 +126,7 @@ async function boot() {
 
   try {
     if (await call('running_from_pkg')) {
-      showModal(t('guardTitle'), 'This copy was extracted to TEMP — run the installed exe.', [{ label: 'OK' }]);
+      showModal(t('guardTitle'), t('tempPkgTitle'), [{ label: t('ok') }]);
     }
   } catch (e) { /* non-fatal */ }
 
@@ -232,7 +232,7 @@ async function confirmPath() {
     updateDetectBadge();
     refreshRunning();
   } else {
-    showModal(t('locate'), t('locateDesc'), [{ label: 'OK' }]);
+    showModal(t('locate'), t('locateDesc'), [{ label: t('ok') }]);
   }
 }
 
@@ -274,7 +274,7 @@ function stepLine(text, cls) {
 }
 
 async function doInstall() {
-  if (!state.gamePath) { showModal(t('locate'), t('noGame'), [{ label: 'OK' }]); return; }
+  if (!state.gamePath) { showModal(t('locate'), t('noGame'), [{ label: t('ok') }]); return; }
   if (!state.selectedMode) {
     // default to T1 instead of silently no-oping
     state.selectedMode = 'T1';
@@ -310,7 +310,7 @@ async function doInstall() {
     document.getElementById('step-log').innerHTML = '';
     stepLine(String(e), 'skip');
     const msg = String(e).includes('NeedsAdmin') ? t('needsAdmin') : String(e);
-    showModal(t('guardTitle'), msg, [{ label: 'OK' }]);
+    showModal(t('guardTitle'), msg, [{ label: t('ok') }]);
   }
   btn.disabled = false;
   updateDetectBadge();
@@ -320,10 +320,10 @@ async function doInstall() {
 async function doBackupNow() {
   try {
     const name = await call('do_backup_cmd', { path: state.gamePath || '' });
-    stepLine(`[backup] ${name}`, 'ok');
+    stepLine(`[${t('backupLog')}] ${name}`, 'ok');
     renderBackups();
   } catch (e) {
-    showModal(t('advTitle'), String(e), [{ label: 'OK' }]);
+    showModal(t('advTitle'), String(e), [{ label: t('ok') }]);
   }
 }
 
@@ -357,10 +357,10 @@ async function renderBackups() {
       if (!go) return;
       try {
         const rep = await call('do_restore', { name: n, path: state.gamePath || '' });
-        stepLine(`[restore] ${n} — ${rep.removed_addons.length} addons removed`, 'ok');
+        stepLine(`[restore] ${n} — ${rep.removed_addons.length} ${t('addonsRemoved')}`, 'ok');
         updateDetectBadge();
       } catch (e) {
-        showModal(t('restore'), String(e), [{ label: 'OK' }]);
+        showModal(t('restore'), String(e), [{ label: t('ok') }]);
       }
     };
     row.appendChild(name);
@@ -372,7 +372,7 @@ async function renderBackups() {
 // ---------- revert vanilla ----------
 async function doRevertVanilla() {
   if (!state.gamePath) {
-    showModal(t('revertVanilla'), t('noGame'), [{ label: 'OK' }]);
+    showModal(t('revertVanilla'), t('noGame'), [{ label: t('ok') }]);
     return;
   }
   const confirm = await showModal(t('revertVanilla'), t('confirmRevertVanilla'), [
@@ -391,14 +391,14 @@ async function doRevertVanilla() {
     if (rep.restored_gi) details.push('gameinfo.gi');
     if (rep.restored_video) details.push('cfg\\video.txt');
     if (rep.removed_addons && rep.removed_addons.length > 0) {
-      details.push(`${rep.removed_addons.length} addons removed`);
+      details.push(`${rep.removed_addons.length} ${t('addonsRemoved')}`);
     }
-    stepLine(`[revert] ${details.join(', ') || 'restored'}`, 'ok');
+    stepLine(`[${t('revertLog')}] ${details.join(', ') || t('restored')}`, 'ok');
     updateDetectBadge();
     showModal(t('revertVanilla'), t('revertComplete'), [{ label: 'OK', kind: 'apply' }]);
   } catch (e) {
     stepLine(String(e), 'skip');
-    showModal(t('revertVanilla'), String(e), [{ label: 'OK' }]);
+    showModal(t('revertVanilla'), String(e), [{ label: t('ok') }]);
   }
   if (btn) btn.disabled = false;
 }
@@ -418,7 +418,7 @@ async function doUnlock() {
     state.unlocked = true;
     showTesterModes();
   } catch (e) {
-    showModal(t('testerTitle'), t('unlockBad'), [{ label: 'OK' }]);
+    showModal(t('testerTitle'), t('unlockBad'), [{ label: t('ok') }]);
   }
 }
 
@@ -638,17 +638,12 @@ function renderValvePings(servers) {
 
   // footer: relays online + last test time
   const footer = document.getElementById('net-footer');
-  const tag = document.getElementById('last-test-tag');
   lastTestAt = Date.now();
   const time = new Date(lastTestAt).toLocaleTimeString(state.lang === 'fa' ? 'fa-IR' : 'en-GB');
   startAgoTicker();
   if (footer) {
     footer.style.display = 'flex';
     footer.innerHTML = `<span>${t('lastTest')} · ${time}</span><span>${online.length}/${servers.length} ${t('relaysOnline')}</span>`;
-  }
-  if (tag) {
-    tag.style.display = 'inline-flex';
-    tag.textContent = `● ${t('live')}`;
   }
 }
 

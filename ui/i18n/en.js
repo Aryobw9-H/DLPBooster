@@ -34,6 +34,7 @@ window.I18N_EN = {
   latencyNoticeDesc: "Frame pacing and NVIDIA Reflex optimizations are automatically integrated into graphics presets. Granular latency tuning options will be available in the next update.",
   unitStatus: "New Health bars",
   unitStatusDesc: "Writes citadel_unit_status_use_new to your autoexec.cfg on next install",
+  hudSwitchDesc: "Show updated health bar visuals",
   install: "APPLY TO DEADLOCK",
   // fov panel
   fovTitle: "FIELD OF VIEW",
@@ -45,6 +46,9 @@ window.I18N_EN = {
   fovResetTitle: "Reset Field of View",
   fovResetDesc: "Reset back to Deadlock default FOV (90 degrees)",
   btnFovReset: "Reset 90",
+  fovNarrow: "NARROW",
+  fovWide: "WIDE",
+  fovDefaultTick: "DEFAULT · 90°",
   // advanced panel
   advTitle: "Backup & restore",
   backupNow: "BACK UP NOW",
@@ -80,6 +84,7 @@ window.I18N_EN = {
   windowClose: "Close",
   langToggle: "FA",
   langName: "English",
+  ok: "OK",
   // Revert vanilla
   revertVanilla: "Revert all changes",
   revertVanillaDesc: "Remove all mods, graphics presets and restore stock files from .dlp.bak",
@@ -87,7 +92,6 @@ window.I18N_EN = {
   confirmRevertVanilla: "Are you sure? All booster changes and mods will be removed and original files will be restored.",
   revertComplete: "All changes reverted successfully.",
   // Valve Ping
-  valvePingTitle: "DEADLOCK RELAY NETWORK",
   btnRefreshPing: "Refresh Ping",
   pingTesting: "Measuring latency...",
   bestServer: "Best server for you: ",
@@ -130,7 +134,7 @@ window.I18N_EN = {
   customAutoexecPlaceholder: "// Enter your custom console cvars here\nsensitivity 1.25\nfps_max 0",
   btnSaveAutoexec: "Save Settings",
   autoexecSaved: "Autoexec settings saved.",
-  btnTestRelays: "TEST ALL RELAYS",
+  btnTestRelays: "Latency",
   availableRelays: "AVAILABLE RELAYS",
   recommended: "RECOMMENDED",
   bestRoute: "BEST ROUTE",
@@ -159,4 +163,11 @@ window.I18N_EN = {
   secDisplay: "DISPLAY",
   secHud: "HUD",
   secConfig: "CONFIGURATION",
+  activeProfile: "ACTIVE",
+  addonsRemoved: "addons removed",
+  restored: "restored",
+  backupLog: "backup",
+  restoreLog: "restore",
+  revertLog: "revert",
+  tempPkgTitle: "This copy was extracted to TEMP — run the installed exe.",
 };
