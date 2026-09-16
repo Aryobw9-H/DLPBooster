@@ -731,8 +731,6 @@ function selectCardByKey(tabKey) {
   if (active && window.Motion) {
     Motion.animate(active, { opacity: [0, 1], transform: ['translateY(10px)', 'translateY(0px)'] }, { duration: 0.28, easing: 'ease-out' });
   }
-  const pingBtn = document.getElementById('btn-refresh-ping');
-  if (pingBtn) pingBtn.style.display = tabKey === 'latency' ? '' : 'none';
   if (tabKey === 'latency') refreshValvePings();
   if (tabKey === 'advanced') renderBackups();
 }
