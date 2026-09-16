@@ -118,6 +118,11 @@
             <i class="fa-solid fa-desktop" id="section-icon" style="font-size:13px;color:var(--deadlock-orange)"></i>
             <span id="section-title">تنظیمات گرافیکی</span>
           </div>
+          <button class="btn-apply btn-sm" id="btn-refresh-ping" onclick="refreshValvePings()" style="display:none">
+            <i class="fa-solid fa-wave-square refresh-icon"></i>
+            <span data-i18n="btnTestRelays">تست پینگ</span>
+          </button>
+          </div>
         </div>
 
         <!-- GRAPHIC SETTING: 4 Tiers + Long FOV Box -->
@@ -238,10 +243,6 @@
                 <span class="net-label">NETWORK</span>
                 <span class="ping-view-title" data-i18n="cardLatency">تاخیر شبکه</span>
               </div>
-              <button class="btn-apply btn-sm" id="btn-refresh-ping" onclick="refreshValvePings()">
-                <i class="fa-solid fa-wave-square refresh-icon"></i>
-                <span data-i18n="btnTestRelays">TEST ALL RELAYS</span>
-              </button>
             </div>
             <!-- BEST ROUTE + relays + footer: one scrollable page -->
             <div class="latency-scroll">
