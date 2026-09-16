@@ -129,7 +129,7 @@ window.I18N_FA = {
   customAutoexecPlaceholder: "// کدهای کنسول دلخواه خود را اینجا بنویسید\nsensitivity 1.25\nfps_max 0",
   btnSaveAutoexec: "ذخیره تنظیمات",
   autoexecSaved: "تنظیمات Autoexec ذخیره شد.",
-  btnTestRelays: "پینگ",
+  btnTestRelays: "تست پینگ",
   availableRelays: "رله‌های موجود",
   recommended: "پیشنهادی",
   bestRoute: "بهترین مسیر",

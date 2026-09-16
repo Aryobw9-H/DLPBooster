@@ -134,7 +134,7 @@ window.I18N_EN = {
   customAutoexecPlaceholder: "// Enter your custom console cvars here\nsensitivity 1.25\nfps_max 0",
   btnSaveAutoexec: "Save Settings",
   autoexecSaved: "Autoexec settings saved.",
-  btnTestRelays: "Latency",
+  btnTestRelays: "TEST PING",
   availableRelays: "AVAILABLE RELAYS",
   recommended: "RECOMMENDED",
   bestRoute: "BEST ROUTE",

@@ -242,22 +242,15 @@ async function updateDetectBadge() {
   const cit = state.gamePath.replace(/[\\/]+$/, '') + '\\game\\citadel';
   let res;
   try { res = await call('detect_tier_cmd', { citadel: cit }); } catch (e) { return; }
-  const badge = document.getElementById('detect-badge');
   const apDot = document.getElementById('active-dot');
   const apLabel = document.getElementById('active-profile-label');
     if (res === 'T1' || res === 'T2' || res === 'T3') {
-      badge.textContent = `${res} ` + t('currentTier');
-      badge.style.color = 'var(--deadlock-orange)';
       if (apDot) { apDot.style.background = 'var(--deadlock-orange)'; apDot.style.color = 'var(--deadlock-orange)'; }
       if (apLabel) apLabel.textContent = 'ACTIVE · ' + res;
     } else if (res === 'MISSING') {
-      badge.textContent = t('currentMissing');
-      badge.style.color = 'var(--text-muted)';
       if (apDot) { apDot.style.background = 'var(--text-muted)'; apDot.style.color = 'var(--text-muted)'; }
       if (apLabel) apLabel.textContent = t('currentMissing');
     } else {
-      badge.textContent = t('currentUnknown');
-      badge.style.color = 'var(--deadlock-cyan)';
       if (apDot) { apDot.style.background = 'var(--deadlock-cyan)'; apDot.style.color = 'var(--deadlock-cyan)'; }
       if (apLabel) apLabel.textContent = t('currentUnknown');
     }
@@ -738,8 +731,6 @@ function selectCardByKey(tabKey) {
   if (active && window.Motion) {
     Motion.animate(active, { opacity: [0, 1], transform: ['translateY(10px)', 'translateY(0px)'] }, { duration: 0.28, easing: 'ease-out' });
   }
-  const badge = document.getElementById('detect-badge');
-  if (badge) badge.style.display = tabKey === 'graphic' ? '' : 'none';
   if (tabKey === 'latency') refreshValvePings();
   if (tabKey === 'advanced') renderBackups();
 }
