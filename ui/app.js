@@ -559,7 +559,7 @@ function relayCardHtml(s, featured) {
   const score = routeScore(s);
   const sl = scoreLabel(score);
   const agoSec = lastTestAt ? Math.max(0, Math.round((Date.now() - lastTestAt) / 1000)) : null;
-  const liveTxt = agoSec === null ? t('live') : `${t('live')} · ${agoSec}s`;
+  const liveTxt = agoSec === null ? '●' : `● ${agoSec}s`;
   const hs = hist;
   const avgV = hs.length ? Math.round(hs.reduce((a, b) => a + b, 0) / hs.length) : null;
   const minV = hs.length ? Math.min(...hs) : null;
@@ -657,7 +657,7 @@ function startAgoTicker() {
     const time = new Date(lastTestAt).toLocaleTimeString(state.lang === 'fa' ? 'fa-IR' : 'en-GB');
     footer.innerHTML = `<span>${t('lastTest')} · ${time} (${ago}s)</span>`;
     const fc = document.querySelector('.fc-live');
-    if (fc && !fc.textContent.includes(t('offline'))) fc.textContent = `${t('live')} · ${ago}s ●`;
+    if (fc && !fc.textContent.includes(t('offline'))) fc.textContent = `● ${ago}s`;
   }, 1000);
 }
 
