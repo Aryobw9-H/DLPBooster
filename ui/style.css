@@ -2779,5 +2779,3 @@ body.lang-fa .hud-switch-label {
   cursor: pointer;
 }
 #btn-refresh-ping:hover { border-color: var(--deadlock-orange); }
-#btn-refresh-ping .refresh-icon.spin { animation: dlp-spin 0.8s linear infinite; }
-@keyframes dlp-spin { to { transform: rotate(360deg); } }
