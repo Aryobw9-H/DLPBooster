@@ -1317,7 +1317,7 @@ button:active,
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  height: 36px;
+  height: 32px;
 }
 
 .fov-chips-label {
@@ -1350,10 +1350,10 @@ button:active,
 
 .ping-view-header {
   display: flex;
-  justify-content: space-between; /* title removed — button alone at top-right */
+  justify-content: flex-end; /* title removed — button alone at top-right */
   align-items: center;
-  height: 36px;
-  min-height: 36px;
+  height: 32px;
+  min-height: 32px;
   flex-shrink: 0;
 }
 
@@ -1723,7 +1723,7 @@ button:active,
 
 .tier-card-sm {
   flex: 1;
-  height: 36px;
+  height: 32px;
   background: rgba(15, 23, 42, 0.8);
   border: 1px solid var(--card-border);
   border-radius: 6px;
